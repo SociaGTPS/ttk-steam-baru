@@ -1,490 +1,625 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistem Karyawan — Steam MP 7000</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fff0f3; color: #333; min-height: 100vh; display: flex; flex-direction: column; }
-h1,h2,h3,h4 { font-family: 'Playfair Display', serif; }
-.page { display: none; flex: 1; }
-.page.active { display: flex; flex-direction: column; }
-main { flex: 1; }
-
-/* TOP BAR */
-.top-bar { background: #c41e3a; color: white; padding: 15px 20px; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 100; }
-.logo-mark { width: 40px; height: 40px; border-radius: 8px; background: white; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #c41e3a; }
-.top-bar-title { font-size: 16px; font-weight: 700; }
-.top-bar-sub { font-size: 11px; opacity: 0.7; margin-top: 2px; }
-
-/* CARD */
-.card { background: white; border-left: 4px solid #c41e3a; border-radius: 8px; padding: 20px; margin: 15px 16px; max-width: 600px; margin-left: auto; margin-right: auto; box-shadow: 0 2px 8px rgba(196,30,58,0.1); }
-
-/* SECTION HEADER */
-.section-header { padding: 20px 20px 0; max-width: 640px; margin: 0 auto; }
-.section-title { font-size: 20px; font-weight: 700; color: #c41e3a; margin-bottom: 5px; }
-.section-sub { font-size: 13px; color: #888; }
-
-/* BACK BUTTON */
-.back-btn { background: none; border: none; color: #888; cursor: pointer; font-size: 13px; margin-bottom: 10px; transition: color 0.2s; }
-.back-btn:hover { color: #c41e3a; }
-
-/* HERO */
-.hero-section { background: #c41e3a; color: white; text-align: center; padding: 40px 20px; }
-.hero-title { font-size: 32px; font-weight: 800; margin: 10px 0; }
-.hero-sub { font-size: 14px; opacity: 0.8; margin: 10px 0; }
-
-/* MENU CARDS */
-.menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 20px 16px; max-width: 520px; margin: 0 auto; }
-@media(max-width: 400px){ .menu-grid { grid-template-columns: 1fr; } }
-.menu-card { background: white; border: 2px solid #ffcccc; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s; }
-.menu-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(196,30,58,0.15); border-color: #c41e3a; }
-.menu-card-icon { font-size: 36px; margin-bottom: 10px; }
-.menu-card-title { font-size: 15px; font-weight: 700; color: #c41e3a; margin-bottom: 5px; }
-.menu-card-desc { font-size: 12px; color: #888; line-height: 1.4; }
-
-/* STEPPER */
-.stepper-wrap { display: flex; align-items: center; background: white; border: 1px solid #ffcccc; border-radius: 8px; padding: 12px; margin: 12px 16px 0; max-width: 600px; margin-left: auto; margin-right: auto; }
-.step { display: flex; flex-direction: column; align-items: center; flex: 1; }
-.step-circle { width: 32px; height: 32px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #999; font-size: 12px; }
-.step.active .step-circle { background: #c41e3a; color: white; }
-.step.done .step-circle { background: #ffb3b3; color: #c41e3a; }
-.step-label { font-size: 10px; color: #999; margin-top: 5px; text-align: center; }
-.step-line { flex: 1; height: 2px; background: #ffcccc; margin-top: -16px; }
-.step-line.done { background: #ffb3b3; }
-
-/* FORMS */
-.form-group { margin-bottom: 15px; }
-.form-label { display: block; font-size: 12px; font-weight: 600; color: #c41e3a; margin-bottom: 5px; }
-.form-label .req { color: #c41e3a; }
-.form-input, .form-select, .form-textarea { width: 100%; padding: 10px; border: 1px solid #ffcccc; border-radius: 6px; font-family: inherit; font-size: 13px; outline: none; }
-.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #c41e3a; background: #fffbfc; }
-.form-textarea { min-height: 80px; resize: vertical; }
-
-/* UPLOAD */
-.upload-zone { border: 2px dashed #ffcccc; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; background: #fffbfc; transition: all 0.2s; }
-.upload-zone:hover { border-color: #c41e3a; background: #fff0f3; }
-.upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; width: 100%; }
-.upload-icon { font-size: 28px; margin-bottom: 5px; }
-.upload-label { font-size: 12px; color: #888; }
-.upload-preview { max-width: 100%; max-height: 100px; margin-top: 8px; border-radius: 6px; }
-.upload-name { font-size: 11px; color: #c41e3a; margin-top: 5px; font-weight: 600; }
-
-/* BUTTONS */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 11px 22px; border-radius: 6px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s; }
-.btn-primary { background: #c41e3a; color: white; }
-.btn-primary:hover { background: #a41628; transform: translateY(-2px); }
-.btn-outline { background: white; color: #c41e3a; border: 1.5px solid #c41e3a; }
-.btn-outline:hover { background: #fff0f3; border-color: #a41628; }
-.btn-outline-white { background: transparent; color: white; border: 1.5px solid white; }
-.btn-outline-white:hover { background: rgba(255,255,255,0.1); }
-.btn-success { background: #2d7a4a; color: white; }
-.btn-success:hover { background: #1f5533; }
-.btn-sm { padding: 7px 14px; font-size: 12px; }
-.btn-full { width: 100%; }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-/* CREDENTIAL BOX */
-.credential-box { background: #c41e3a; color: white; border-radius: 8px; padding: 25px; text-align: center; margin-bottom: 20px; }
-.cred-label { font-size: 10px; text-transform: uppercase; opacity: 0.7; margin-bottom: 5px; }
-.cred-value { font-size: 36px; font-weight: 800; letter-spacing: 4px; margin: 10px 0; }
-.cred-warning { background: #fffbfc; border: 1.5px solid #ffcccc; border-radius: 6px; padding: 12px; font-size: 12px; color: #333; margin-top: 15px; text-align: left; }
-.cred-warning strong { color: #c41e3a; display: block; margin-bottom: 3px; }
-
-/* SIGNATURE */
-#signaturePad { border: 1px solid #ffcccc; border-radius: 6px; width: 100%; background: white; display: block; }
-
-/* CONTRACT */
-#contractPreview { background: white; border: 1px solid #ffcccc; border-radius: 6px; padding: 15px; font-size: 12px; max-height: 300px; overflow-y: auto; }
-#contractPreview h4 { text-align: center; color: #c41e3a; margin-bottom: 10px; font-size: 13px; }
-
-/* MODAL */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; display: flex; align-items: center; justify-content: center; }
-.modal-box { background: white; border-radius: 12px; padding: 30px; width: 90%; max-width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-.pin-icon { font-size: 44px; margin-bottom: 10px; }
-.pin-title { font-size: 20px; font-weight: 700; color: #c41e3a; margin-bottom: 5px; }
-.pin-sub { font-size: 12px; color: #888; margin-bottom: 15px; }
-.pin-input { width: 100%; padding: 12px; text-align: center; font-size: 24px; letter-spacing: 8px; font-weight: 700; border: 2px solid #ffcccc; border-radius: 6px; outline: none; margin-bottom: 12px; color: #c41e3a; }
-.pin-input:focus { border-color: #c41e3a; }
-.pin-error { color: #c41e3a; font-size: 12px; margin-bottom: 10px; display: none; }
-
-/* OWNER DASHBOARD */
-.owner-header { background: #c41e3a; color: white; padding: 25px 20px; border-bottom: 2px solid #ffcccc; }
-.owner-title { font-size: 22px; font-weight: 800; }
-.data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.data-table th { background: #c41e3a; color: white; padding: 10px; text-align: left; font-size: 11px; font-weight: 600; }
-.data-table td { padding: 10px; border-bottom: 1px solid #ffcccc; }
-.data-table tr:hover td { background: #fff0f3; }
-.table-wrapper { overflow-x: auto; border-radius: 8px; border: 1px solid #ffcccc; }
-
-/* ALERTS */
-.alert { padding: 12px; border-radius: 6px; font-size: 12px; margin-bottom: 15px; border-left: 4px solid; }
-.alert-info { background: #fff0f3; color: #c41e3a; border-color: #ffcccc; }
-.alert-success { background: #dcfce7; color: #166534; border-color: #86efac; }
-
-/* SUCCESS */
-.success-icon { font-size: 60px; margin-bottom: 10px; }
-.success-title { font-size: 22px; font-weight: 700; color: #2d7a4a; margin-bottom: 5px; }
-.success-sub { font-size: 13px; color: #888; line-height: 1.5; }
-
-/* EMPTY STATE */
-.empty-state { text-align: center; padding: 40px 20px; color: #888; }
-.empty-state-icon { font-size: 48px; margin-bottom: 10px; }
-
-/* DIVIDER */
-.gold-hr { border: none; height: 1px; background: #ffcccc; margin: 15px 0; }
-
-/* TOAST */
-.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #c41e3a; color: white; padding: 12px 20px; border-radius: 6px; font-size: 12px; z-index: 999; animation: toastSlide 0.3s ease, toastFade 0.3s ease 2.5s forwards; }
-@keyframes toastSlide { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-@keyframes toastFade { to { opacity: 0; transform: translateX(-50%) translateY(20px); } }
-
-/* FOOTER */
-footer { background: #c41e3a; color: rgba(255,255,255,0.7); text-align: center; padding: 12px; font-size: 11px; margin-top: auto; }
-footer strong { color: white; }
-
-/* UTILITY */
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-@media(max-width: 420px) { .two-col { grid-template-columns: 1fr; } }
-
-/* SPINNER */
-.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1a0a0e">
+  <title>Steam MP 7000 — Sistem Karyawan</title>
 </head>
 <body>
 
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --dark:#1a0a0e;--dark-2:#2d1219;--dark-3:#3f1a24;--dark-4:#56232f;
+  --red:#be123c;--red-h:#9f1239;--red-dim:rgba(190,18,60,0.15);
+  --red-soft:#fca5a5;--red-mid:#fb7185;
+  --text:#fff;--text-m:rgba(255,255,255,0.6);--text-d:rgba(255,255,255,0.32);
+  --b1:rgba(255,255,255,0.08);--b2:rgba(255,255,255,0.14);
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--dark);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;}
+.page{display:none;}.page.active{display:block;}
+.container{max-width:480px;margin:0 auto;padding:20px 16px;}
+
+.top-bar{background:var(--dark-2);border-bottom:1px solid var(--b1);padding:12px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50;}
+.logo{width:36px;height:36px;background:var(--red);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;}
+.top-bar-name{font-size:15px;font-weight:600;}
+.top-bar-sub{font-size:11px;color:var(--text-m);}
+
+.hero{background:var(--dark-2);border-bottom:1px solid var(--b1);padding:30px 20px;text-align:center;}
+.hero h2{font-size:23px;font-weight:700;margin-bottom:6px;}
+.hero p{font-size:13px;color:var(--text-m);}
+
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px;}
+.menu-card{background:var(--dark-2);border:1px solid var(--b1);border-radius:12px;padding:22px 12px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;}
+.menu-card:hover{border-color:var(--red);background:var(--dark-3);}
+.menu-icon{font-size:26px;margin-bottom:8px;}
+.menu-title{font-size:14px;font-weight:600;margin-bottom:3px;}
+.menu-desc{font-size:11px;color:var(--text-m);}
+
+.section-title{font-size:17px;font-weight:700;margin-bottom:3px;}
+.section-sub{font-size:12px;color:var(--text-m);margin-bottom:16px;}
+.back-btn{background:none;border:none;color:var(--text-m);cursor:pointer;font-size:12px;padding:0;margin-bottom:14px;display:inline-flex;align-items:center;gap:4px;}
+.back-btn:hover{color:#fff;}
+
+.card{background:var(--dark-2);border:1px solid var(--b1);border-radius:12px;padding:20px;margin-bottom:16px;}
+
+.stepper{display:flex;align-items:center;margin-bottom:20px;}
+.step-dot{width:30px;height:30px;border-radius:50%;background:var(--dark-3);color:var(--text-m);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--b1);}
+.step-dot.active{background:var(--red);color:#fff;border-color:var(--red);}
+.step-dot.done{background:var(--dark-4);color:var(--red-mid);border-color:var(--dark-4);}
+.step-line{flex:1;height:1px;background:var(--b1);}
+.step-line.done{background:var(--dark-4);}
+
+.form-label{display:block;font-size:11px;font-weight:600;color:var(--text-m);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;}
+.req{color:var(--red-mid);}
+.form-group{margin-bottom:15px;}
+.form-input,.form-select,.form-textarea{width:100%;padding:9px 12px;background:var(--dark);border:1px solid var(--b2);border-radius:8px;font-family:inherit;font-size:13px;color:#fff;outline:none;}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--text-d);}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--red);}
+.form-select option{background:#2d1219;color:#fff;}
+.form-textarea{min-height:68px;resize:vertical;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.divider{border:none;border-top:1px solid var(--b1);margin:16px 0;}
+
+.upload-zone{border:1px dashed var(--b2);border-radius:8px;padding:14px;text-align:center;cursor:pointer;position:relative;background:var(--dark);transition:border-color .2s;}
+.upload-zone:hover{border-color:var(--red);}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer;}
+.upload-icon{font-size:20px;margin-bottom:3px;}
+.upload-label{font-size:11px;color:var(--text-m);}
+.upload-preview{max-width:100%;max-height:70px;margin-top:8px;border-radius:6px;}
+.upload-name{font-size:11px;color:#4ade80;margin-top:4px;font-weight:600;}
+
+.alert-info{background:var(--red-dim);border-left:3px solid var(--red);border-radius:0 8px 8px 0;padding:10px 12px;font-size:12px;color:var(--red-soft);margin-bottom:14px;}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .15s;font-family:inherit;}
+.btn-primary{background:var(--red);color:#fff;}
+.btn-primary:hover{background:var(--red-h);}
+.btn-outline{background:transparent;color:var(--text-m);border:1px solid var(--b2);}
+.btn-outline:hover{color:#fff;background:var(--dark-3);border-color:var(--b2);}
+.btn-success{background:#166534;color:#fff;}
+.btn-success:hover{background:#14532d;}
+.btn-danger{background:#7f1d1d;color:#fff;}
+.btn-danger:hover{background:#6b1515;}
+.btn-full{width:100%;}
+.btn-sm{padding:6px 11px;font-size:12px;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+
+.cred-box{background:var(--dark-3);border:1px solid var(--b1);border-radius:12px;padding:22px;text-align:center;margin-bottom:16px;}
+.cred-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-m);margin-bottom:5px;}
+.cred-value{font-size:28px;font-weight:800;letter-spacing:7px;color:#fff;margin:0 0 14px;}
+.cred-div{height:1px;background:var(--b1);margin:0 0 14px;}
+.cred-note{background:var(--red-dim);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--red-soft);text-align:left;}
+
+.contract-preview{background:var(--dark);border:1px solid var(--b1);border-radius:8px;padding:14px;font-size:12px;color:rgba(255,255,255,.8);line-height:1.8;max-height:200px;overflow-y:auto;margin-bottom:14px;}
+.contract-preview h4{text-align:center;font-size:13px;color:var(--red-soft);margin-bottom:10px;}
+
+#signaturePad{border:1px solid var(--b2);border-radius:8px;width:100%;background:#fff;display:block;cursor:crosshair;}
+
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;display:flex;align-items:center;justify-content:center;}
+.modal-box{background:var(--dark-2);border:1px solid var(--b2);border-radius:14px;padding:26px 22px;width:90%;max-width:300px;text-align:center;}
+.pin-title{font-size:17px;font-weight:700;margin-bottom:4px;}
+.pin-sub{font-size:12px;color:var(--text-m);margin-bottom:14px;}
+.pin-input{width:100%;padding:11px;text-align:center;font-size:22px;letter-spacing:10px;font-weight:700;background:var(--dark);border:1px solid var(--b2);border-radius:8px;outline:none;color:var(--red-soft);margin-bottom:10px;font-family:inherit;}
+.pin-input:focus{border-color:var(--red);}
+.pin-error{color:var(--red-mid);font-size:12px;margin-bottom:10px;display:none;}
+
+.owner-header{background:var(--dark-2);border-bottom:1px solid var(--b1);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;}
+.owner-header-title{font-size:16px;font-weight:700;}
+
+.tabs{display:flex;gap:8px;margin-bottom:16px;}
+.tab{padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--b1);color:var(--text-m);background:var(--dark-2);}
+.tab.active{background:var(--red);color:#fff;border-color:var(--red);}
+
+.table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--b1);}
+.data-table{width:100%;border-collapse:collapse;font-size:12px;}
+.data-table th{background:var(--dark-3);color:var(--text-m);padding:9px 10px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+.data-table td{padding:9px 10px;border-bottom:1px solid var(--b1);color:rgba(255,255,255,.85);}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:var(--dark-3);}
+
+.badge{display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700;}
+.badge-pending{background:rgba(180,130,0,.2);color:#fcd34d;}
+.badge-ok{background:rgba(22,101,52,.3);color:#4ade80;}
+
+.empty-state{text-align:center;padding:36px 20px;color:var(--text-m);}
+.empty-icon{font-size:34px;margin-bottom:8px;}
+
+.success-wrap{text-align:center;padding:60px 20px 40px;}
+.success-wrap .icon{font-size:50px;margin-bottom:14px;}
+.success-wrap h2{font-size:20px;font-weight:700;color:#4ade80;margin-bottom:6px;}
+.success-wrap p{font-size:13px;color:var(--text-m);line-height:1.6;margin-bottom:24px;}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--dark-3);border:1px solid var(--b2);color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;z-index:999;animation:tIn .25s ease,tOut .25s ease 2.5s forwards;white-space:nowrap;}
+@keyframes tIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes tOut{to{opacity:0}}
+
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+footer{background:var(--dark-2);border-top:1px solid var(--b1);color:var(--text-m);text-align:center;padding:12px;font-size:11px;margin-top:20px;}
+footer strong{color:rgba(255,255,255,.7);}
+</style>
+
 <script>
-const BACKEND_API_URL = "https://script.google.com/macros/s/AKfycbzRdh-WEEwKgFOCLFWJIZgANOzOLduJHd4ww-QqlVSjCyjakelJHftSRQCIDDkAjzhZ/exec";
-const OWNER_PIN = "1234";
+const API="https://script.google.com/macros/s/AKfycbzRdh-WEEwKgFOCLFWJIZgANOzOLduJHd4ww-QqlVSjCyjakelJHftSRQCIDDkAjzhZ/exec";
+// PIN tidak lagi disimpan di frontend — diverifikasi server-side
+let genID='',genPass='';
+let files={foto:null,ktp:null,kk:null};
+let sigCanvas,sigCtx,drawing=false;
 </script>
 
 <!-- TOP BAR -->
 <div class="top-bar">
-  <div class="logo-mark">SM</div>
+  <div class="logo">SM</div>
   <div>
-    <div class="top-bar-title">Steam MP 7000</div>
+    <div class="top-bar-name">Steam MP 7000</div>
     <div class="top-bar-sub">Sistem Manajemen Karyawan</div>
   </div>
 </div>
 
-<!-- PAGE: LANDING -->
-<div id="page-landing" class="page active">
-  <main>
-    <div class="hero-section">
-      <h1 class="hero-title">Selamat Datang</h1>
-      <p class="hero-sub">Sistem pendaftaran karyawan dan manajemen owner</p>
-    </div>
+<!-- ===================== LANDING ===================== -->
+<div id="p-home" class="page active">
+  <div class="hero">
+    <h2>Selamat Datang</h2>
+    <p>Pilih menu untuk melanjutkan</p>
+  </div>
+  <div class="container">
     <div class="menu-grid">
-      <div class="menu-card" onclick="showPage('page-karyawan-step1')">
-        <div class="menu-card-icon">👷</div>
-        <div class="menu-card-title">Menu Karyawan</div>
-        <div class="menu-card-desc">Pendaftaran & pengajuan</div>
+      <div class="menu-card" onclick="go('p-step1')">
+        <div class="menu-icon">👷</div>
+        <div class="menu-title">Daftar Karyawan</div>
+        <div class="menu-desc">Pendaftaran karyawan baru</div>
       </div>
-      <div class="menu-card" onclick="showPinModal()">
-        <div class="menu-card-icon">🔐</div>
-        <div class="menu-card-title">Menu Owner</div>
-        <div class="menu-card-desc">Dashboard & persetujuan</div>
+      <div class="menu-card" onclick="showPin()">
+        <div class="menu-icon">🔐</div>
+        <div class="menu-title">Dashboard Owner</div>
+        <div class="menu-desc">Kelola pengajuan & data</div>
+      </div>
+      <div class="menu-card" onclick="go('p-lupaid')" style="grid-column:1/-1;">
+        <div class="menu-icon">🔎</div>
+        <div class="menu-title">Lupa ID / Password</div>
+        <div class="menu-desc">Ajukan pemulihan akun ke owner</div>
       </div>
     </div>
-  </main>
-  <footer><strong>Steam MP 7000</strong> • Semua hak dilindungi</footer>
+  </div>
+  <footer><strong>Steam MP 7000</strong> · Semua hak dilindungi</footer>
 </div>
 
-<!-- PIN MODAL -->
-<div id="pinModal" class="modal-overlay" style="display:none;" onclick="if(event.target.id==='pinModal')closePinModal()">
+<!-- ===================== PIN MODAL ===================== -->
+<div id="pinModal" class="modal-bg" style="display:none;" onclick="if(event.target===this)closePin()">
   <div class="modal-box">
-    <div class="pin-icon">🔑</div>
-    <div class="pin-title">Akses Owner</div>
-    <div class="pin-sub">Masukkan PIN Owner</div>
+    <div class="pin-title">🔑 Akses Owner</div>
+    <div class="pin-sub">Masukkan PIN untuk melanjutkan</div>
     <input type="password" inputmode="numeric" maxlength="8" class="pin-input" id="pinInput" placeholder="••••" onkeydown="if(event.key==='Enter')checkPin()">
-    <div class="pin-error" id="pinError">❌ PIN salah!</div>
+    <div class="pin-error" id="pinError">PIN salah, coba lagi</div>
     <button class="btn btn-primary btn-full" onclick="checkPin()">Masuk</button>
-    <button class="btn btn-outline btn-full" style="margin-top:8px;" onclick="closePinModal()">Batal</button>
+    <button class="btn btn-outline btn-full" style="margin-top:8px;" onclick="closePin()">Batal</button>
   </div>
 </div>
 
-<!-- PAGE: KARYAWAN STEP 1 -->
-<div id="page-karyawan-step1" class="page">
-  <main>
-    <div class="section-header">
-      <button class="back-btn" onclick="showPage('page-landing')">← Kembali</button>
-      <div class="section-title">Data Diri & Berkas</div>
-      <div class="section-sub">Langkah 1 dari 3</div>
-    </div>
-    <div class="stepper-wrap">
-      <div class="step active"><div class="step-circle">1</div></div>
-      <div class="step-line"></div>
-      <div class="step"><div class="step-circle">2</div></div>
-      <div class="step-line"></div>
-      <div class="step"><div class="step-circle">3</div></div>
+<!-- ===================== STEP 1: Data Diri ===================== -->
+<div id="p-step1" class="page">
+  <div class="container">
+    <button class="back-btn" onclick="go('p-home')">← Kembali</button>
+    <div class="section-title">Data Diri & Berkas</div>
+    <div class="section-sub">Langkah 1 dari 3</div>
+    <div class="stepper">
+      <div class="step-dot active">1</div><div class="step-line"></div>
+      <div class="step-dot">2</div><div class="step-line"></div>
+      <div class="step-dot">3</div>
     </div>
     <div class="card">
-      <div class="form-group"><label class="form-label">Nama Lengkap <span class="req">*</span></label><input type="text" class="form-input" id="namaLengkap" placeholder="Nama sesuai KTP"></div>
-      <div class="form-group"><label class="form-label">Alamat <span class="req">*</span></label><textarea class="form-textarea" id="alamatKTP" placeholder="Alamat lengkap"></textarea></div>
-      <div class="two-col">
-        <div class="form-group"><label class="form-label">No. KTP <span class="req">*</span></label><input type="text" class="form-input" id="noKTP" inputmode="numeric" maxlength="16" placeholder="16 digit"></div>
-        <div class="form-group"><label class="form-label">No. WhatsApp <span class="req">*</span></label><input type="text" class="form-input" id="noWA" inputmode="numeric" placeholder="08xx-xxxx-xxxx"></div>
+      <div class="form-group">
+        <label class="form-label">Nama Lengkap <span class="req">*</span></label>
+        <input type="text" class="form-input" id="s1-nama" placeholder="Nama sesuai KTP">
       </div>
-      <div class="form-group"><label class="form-label">Cabang <span class="req">*</span></label><select class="form-select" id="cabang"><option value="">— Pilih —</option><option>Cabang Grobogan</option><option>Cabang Palis</option><option>Cabang Cayur</option></select></div>
-      <div class="gold-hr"></div>
-      <div class="form-group"><label class="form-label">Foto Diri <span class="req">*</span></label><div class="upload-zone"><input type="file" accept="image/*" onchange="handleUpload(this,'foto','prev-foto','name-foto')"><div class="upload-icon">📷</div><div class="upload-label">Upload foto diri</div><img class="upload-preview" id="prev-foto" style="display:none;"><div class="upload-name" id="name-foto"></div></div></div>
-      <div class="two-col">
-        <div class="form-group"><label class="form-label">Foto KTP</label><div class="upload-zone"><input type="file" accept="image/*" onchange="handleUpload(this,'ktp','prev-ktp','name-ktp')"><div class="upload-icon">🪪</div><div class="upload-label">Foto KTP</div><img class="upload-preview" id="prev-ktp" style="display:none;"><div class="upload-name" id="name-ktp"></div></div></div>
-        <div class="form-group"><label class="form-label">Foto KK</label><div class="upload-zone"><input type="file" accept="image/*" onchange="handleUpload(this,'kk','prev-kk','name-kk')"><div class="upload-icon">📄</div><div class="upload-label">Foto KK</div><img class="upload-preview" id="prev-kk" style="display:none;"><div class="upload-name" id="name-kk"></div></div></div>
+      <div class="form-group">
+        <label class="form-label">Alamat <span class="req">*</span></label>
+        <textarea class="form-textarea" id="s1-alamat" placeholder="Alamat lengkap"></textarea>
       </div>
-      <div class="alert alert-info"><span>ℹ️ Upload KTP atau KK (salah satu), foto diri wajib</span></div>
+      <div class="two-col">
+        <div class="form-group">
+          <label class="form-label">No. KTP <span class="req">*</span></label>
+          <input type="text" class="form-input" id="s1-ktp" inputmode="numeric" maxlength="16" placeholder="16 digit">
+        </div>
+        <div class="form-group">
+          <label class="form-label">No. WhatsApp <span class="req">*</span></label>
+          <input type="text" class="form-input" id="s1-wa" inputmode="numeric" placeholder="08xx...">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cabang <span class="req">*</span></label>
+        <select class="form-select" id="s1-cabang">
+          <option value="">— Pilih Cabang —</option>
+          <option value="Cabang Grobogan">Cabang Grobogan</option>
+          <option value="Cabang Palis">Cabang Palis</option>
+          <option value="Cabang Cayur">Cabang Cayur</option>
+        </select>
+      </div>
+      <hr class="divider">
+      <div class="form-group">
+        <label class="form-label">Foto Diri <span class="req">*</span></label>
+        <div class="upload-zone">
+          <input type="file" accept="image/*" onchange="upload(this,'foto','pv-foto','nm-foto')">
+          <div class="upload-icon">📷</div><div class="upload-label">Tap untuk upload</div>
+          <img class="upload-preview" id="pv-foto" style="display:none;">
+          <div class="upload-name" id="nm-foto"></div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="form-group">
+          <label class="form-label">Foto KTP</label>
+          <div class="upload-zone">
+            <input type="file" accept="image/*" onchange="upload(this,'ktp','pv-ktp','nm-ktp')">
+            <div class="upload-icon">🪪</div><div class="upload-label">Foto KTP</div>
+            <img class="upload-preview" id="pv-ktp" style="display:none;">
+            <div class="upload-name" id="nm-ktp"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Foto KK</label>
+          <div class="upload-zone">
+            <input type="file" accept="image/*" onchange="upload(this,'kk','pv-kk','nm-kk')">
+            <div class="upload-icon">📄</div><div class="upload-label">Foto KK</div>
+            <img class="upload-preview" id="pv-kk" style="display:none;">
+            <div class="upload-name" id="nm-kk"></div>
+          </div>
+        </div>
+      </div>
+      <div class="alert-info">ℹ️ Upload KTP atau KK (salah satu wajib). Foto diri wajib.</div>
       <button class="btn btn-primary btn-full" onclick="validateStep1()">Lanjut →</button>
     </div>
-  </main>
+  </div>
   <footer><strong>Steam MP 7000</strong></footer>
 </div>
 
-<!-- PAGE: STEP 2 -->
-<div id="page-karyawan-step2" class="page">
-  <main>
-    <div class="section-header"><div class="section-title">Kredensial Akun</div><div class="section-sub">Langkah 2 dari 3</div></div>
+<!-- ===================== STEP 2: Kredensial ===================== -->
+<div id="p-step2" class="page">
+  <div class="container">
+    <div class="section-title">Kredensial Akun</div>
+    <div class="section-sub">Langkah 2 dari 3 — Simpan informasi ini</div>
+    <div class="stepper">
+      <div class="step-dot done">✓</div><div class="step-line done"></div>
+      <div class="step-dot active">2</div><div class="step-line"></div>
+      <div class="step-dot">3</div>
+    </div>
+    <div class="cred-box">
+      <div class="cred-label">ID Karyawan</div>
+      <div class="cred-value" id="disp-id">----</div>
+      <div class="cred-div"></div>
+      <div class="cred-label">Password</div>
+      <div class="cred-value" id="disp-pass">------</div>
+      <div class="cred-note">⚠️ Catat dan simpan baik-baik. Jangan berikan kepada siapapun.</div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="showStep3()">Lanjut →</button>
+  </div>
+  <footer><strong>Steam MP 7000</strong></footer>
+</div>
+
+<!-- ===================== STEP 3: Kontrak ===================== -->
+<div id="p-step3" class="page">
+  <div class="container">
+    <div class="section-title">Kontrak Kerja</div>
+    <div class="section-sub">Langkah 3 dari 3 — Baca dan tanda tangani</div>
+    <div class="stepper">
+      <div class="step-dot done">✓</div><div class="step-line done"></div>
+      <div class="step-dot done">✓</div><div class="step-line done"></div>
+      <div class="step-dot active">3</div>
+    </div>
     <div class="card">
-      <div class="credential-box">
-        <div class="cred-label">ID Karyawan</div>
-        <div class="cred-value" id="displayID">----</div>
-        <div style="height:1px; background:#ffb3b3; margin:15px 0;"></div>
-        <div class="cred-label">Password</div>
-        <div class="cred-value" id="displayPass">------</div>
-        <div class="cred-warning">⚠️ Simpan dengan baik, jangan berikan kepada siapapun!</div>
+      <div class="contract-preview" id="contractText"></div>
+      <div class="form-group" style="margin-top:14px;">
+        <label class="form-label">Tanda Tangan <span class="req">*</span></label>
+        <canvas id="signaturePad" width="400" height="120"></canvas>
+        <button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="clearSig()">Hapus</button>
       </div>
-      <button class="btn btn-primary btn-full" onclick="showStep3()">Lanjut →</button>
+      <button class="btn btn-success btn-full" id="submitBtn" onclick="finalSubmit()" style="margin-top:6px;">Selesai & Kirim ✅</button>
     </div>
-  </main>
+  </div>
   <footer><strong>Steam MP 7000</strong></footer>
 </div>
 
-<!-- PAGE: STEP 3 -->
-<div id="page-karyawan-step3" class="page">
-  <main>
-    <div class="section-header"><div class="section-title">Kontrak Kerja</div><div class="section-sub">Langkah 3 dari 3</div></div>
+<!-- ===================== LUPA ID ===================== -->
+<div id="p-lupaid" class="page">
+  <div class="container">
+    <button class="back-btn" onclick="go('p-home')">← Kembali</button>
+    <div class="section-title">Lupa ID / Password</div>
+    <div class="section-sub">Isi data untuk mengajukan pemulihan akun ke Owner</div>
     <div class="card">
-      <div id="contractPreview"></div>
-      <div class="gold-hr"></div>
-      <div class="form-group"><label class="form-label">Tanda Tangan <span class="req">*</span></label><canvas id="signaturePad" width="400" height="150"></canvas><button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="clearSignature()">Hapus</button></div>
-      <button class="btn btn-success btn-full" id="submitBtn" onclick="finalSubmit()">Selesai ✅</button>
-    </div>
-  </main>
-  <footer><strong>Steam MP 7000</strong></footer>
-</div>
-
-<!-- PAGE: SUCCESS -->
-<div id="page-success" class="page">
-  <main style="display:flex; align-items:center; justify-content:center; padding:40px 20px;">
-    <div style="text-align:center; max-width:350px;">
-      <div class="success-icon">🎉</div>
-      <div class="success-title">Berhasil!</div>
-      <p class="success-sub">Data Anda terkirim. Tunggu konfirmasi dari Owner.</p>
-      <button class="btn btn-primary" style="margin-top:20px;" onclick="showPage('page-landing')">← Menu Utama</button>
-    </div>
-  </main>
-  <footer><strong>Steam MP 7000</strong></footer>
-</div>
-
-<!-- PAGE: OWNER DASHBOARD -->
-<div id="page-owner" class="page">
-  <main>
-    <div class="owner-header">
-      <div class="owner-title">Dashboard Owner</div>
-      <button class="btn btn-outline-white btn-sm" style="margin-top:12px;" onclick="showPage('page-landing')">← Keluar</button>
-    </div>
-    <div style="padding:20px 16px; max-width:800px; margin:0 auto;">
-      <div style="display:flex; gap:10px; margin-bottom:15px;">
-        <div style="font-size:15px; font-weight:700; color:#c41e3a;">📋 Pengajuan</div>
-        <button class="btn btn-outline btn-sm" onclick="loadOwnerData()">Refresh</button>
+      <div class="form-group">
+        <label class="form-label">Nama Lengkap <span class="req">*</span></label>
+        <input type="text" class="form-input" id="li-nama" placeholder="Nama sesuai KTP">
       </div>
-      <div id="ownerTableContainer"><div class="empty-state"><div class="empty-state-icon">⏳</div><div>Memuat...</div></div></div>
+      <div class="form-group">
+        <label class="form-label">No. WhatsApp <span class="req">*</span></label>
+        <input type="text" class="form-input" id="li-wa" inputmode="numeric" placeholder="08xx...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cabang <span class="req">*</span></label>
+        <select class="form-select" id="li-cabang">
+          <option value="">— Pilih Cabang —</option>
+          <option value="Cabang Grobogan">Cabang Grobogan</option>
+          <option value="Cabang Palis">Cabang Palis</option>
+          <option value="Cabang Cayur">Cabang Cayur</option>
+        </select>
+      </div>
+      <div class="alert-info">ℹ️ Owner akan menghubungi Anda via WhatsApp setelah pengajuan disetujui.</div>
+      <button class="btn btn-primary btn-full" id="lupaBtn" onclick="submitLupaID()">Kirim Pengajuan</button>
     </div>
-  </main>
+  </div>
+  <footer><strong>Steam MP 7000</strong></footer>
+</div>
+
+<!-- ===================== SUCCESS ===================== -->
+<div id="p-success" class="page">
+  <div class="container">
+    <div class="success-wrap">
+      <div class="icon">✅</div>
+      <h2>Berhasil Dikirim!</h2>
+      <p>Data Anda telah terkirim ke sistem.<br>Notifikasi dikirim ke Owner via Telegram.</p>
+      <button class="btn btn-primary" onclick="go('p-home')">← Menu Utama</button>
+    </div>
+  </div>
+  <footer><strong>Steam MP 7000</strong></footer>
+</div>
+
+<!-- ===================== SUCCESS LUPA ID ===================== -->
+<div id="p-success-lupa" class="page">
+  <div class="container">
+    <div class="success-wrap">
+      <div class="icon">📨</div>
+      <h2>Pengajuan Terkirim!</h2>
+      <p>Pengajuan lupa ID Anda sudah diterima.<br>Tunggu konfirmasi Owner via WhatsApp.</p>
+      <button class="btn btn-primary" onclick="go('p-home')">← Menu Utama</button>
+    </div>
+  </div>
+  <footer><strong>Steam MP 7000</strong></footer>
+</div>
+
+<!-- ===================== OWNER DASHBOARD ===================== -->
+<div id="p-owner" class="page">
+  <div class="owner-header">
+    <div class="owner-header-title">Dashboard Owner</div>
+    <button class="btn btn-outline btn-sm" onclick="go('p-home')">Keluar</button>
+  </div>
+  <div class="container">
+    <div class="tabs">
+      <div class="tab active" id="tab-lupa" onclick="switchTab('lupa')">🔎 Lupa ID</div>
+      <div class="tab" id="tab-master" onclick="switchTab('master')">📋 Master Karyawan</div>
+    </div>
+    <div id="panel-lupa">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text-m);">Pengajuan masuk</div>
+        <button class="btn btn-outline btn-sm" onclick="loadPengajuan()">⟳ Refresh</button>
+      </div>
+      <div id="tbl-pengajuan"><div class="empty-state"><div class="empty-icon">⏳</div><div>Memuat...</div></div></div>
+    </div>
+    <div id="panel-master" style="display:none;">
+      <div class="empty-state"><div class="empty-icon">📊</div><div style="font-size:13px;">Fitur Master Karyawan<br>tersedia di Google Sheets.</div></div>
+    </div>
+  </div>
   <footer><strong>Steam MP 7000</strong></footer>
 </div>
 
 <script>
-let currentPage = 'page-landing';
-let generatedID = '';
-let generatedPass = '';
-let uploadedFiles = { foto: null, ktp: null, kk: null };
-
-function showPage(pageId) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(pageId).classList.add('active');
-  currentPage = pageId;
-  window.scrollTo(0, 0);
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
 }
-
-function showPinModal() {
-  document.getElementById('pinModal').style.display = 'flex';
-  document.getElementById('pinInput').value = '';
-  document.getElementById('pinError').style.display = 'none';
-  setTimeout(() => document.getElementById('pinInput').focus(), 100);
+function showPin(){
+  document.getElementById('pinModal').style.display='flex';
+  document.getElementById('pinInput').value='';
+  document.getElementById('pinError').style.display='none';
+  setTimeout(()=>document.getElementById('pinInput').focus(),100);
 }
-
-function closePinModal() {
-  document.getElementById('pinModal').style.display = 'none';
+function closePin(){document.getElementById('pinModal').style.display='none';}
+function checkPin(){
+  const pin=document.getElementById('pinInput').value;
+  if(!pin){return;}
+  const btn=document.querySelector('#pinModal .btn-primary');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';
+  fetch(API+'?action=verifyPin&pin='+encodeURIComponent(pin))
+    .then(r=>r.json())
+    .then(d=>{
+      if(d.valid){
+        closePin();go('p-owner');loadPengajuan();
+      }else{
+        document.getElementById('pinError').style.display='block';
+        document.getElementById('pinInput').value='';
+        document.getElementById('pinInput').focus();
+        setTimeout(()=>document.getElementById('pinError').style.display='none',3000);
+      }
+    })
+    .catch(()=>{showToast('Gagal verifikasi, coba lagi');})
+    .finally(()=>{btn.disabled=false;btn.innerHTML='Masuk';});
 }
-
-function checkPin() {
-  if (document.getElementById('pinInput').value === OWNER_PIN) {
-    closePinModal();
-    showPage('page-owner');
-    loadOwnerData();
-  } else {
-    document.getElementById('pinError').style.display = 'block';
-    document.getElementById('pinInput').value = '';
-    document.getElementById('pinInput').focus();
-    setTimeout(() => document.getElementById('pinError').style.display = 'none', 3000);
-  }
-}
-
-function handleUpload(input, key, previewId, nameId) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    uploadedFiles[key] = e.target.result;
-    document.getElementById(previewId).src = e.target.result;
-    document.getElementById(previewId).style.display = 'block';
-    document.getElementById(nameId).textContent = '✅ ' + file.name;
+function upload(input,key,pvId,nmId){
+  const f=input.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const MAX=800;
+      let w=img.width,h=img.height;
+      if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
+      const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+      cv.getContext('2d').drawImage(img,0,0,w,h);
+      const resized=cv.toDataURL('image/jpeg',0.7);
+      files[key]=resized;
+      document.getElementById(pvId).src=resized;
+      document.getElementById(pvId).style.display='block';
+      document.getElementById(nmId).textContent='✅ '+f.name;
+    };
+    img.src=e.target.result;
   };
-  reader.readAsDataURL(file);
+  r.readAsDataURL(f);
 }
-
-function validateStep1() {
-  const nama = document.getElementById('namaLengkap').value.trim();
-  const alamat = document.getElementById('alamatKTP').value.trim();
-  const ktp = document.getElementById('noKTP').value.trim();
-  const wa = document.getElementById('noWA').value.trim();
-  const cab = document.getElementById('cabang').value;
-  
-  if (!nama || !alamat || !ktp || !wa || !cab) { showToast('Lengkapi semua field'); return; }
-  if (ktp.length < 16) { showToast('No. KTP harus 16 digit'); return; }
-  if (!uploadedFiles.foto) { showToast('Foto diri wajib'); return; }
-  if (!uploadedFiles.ktp && !uploadedFiles.kk) { showToast('Upload KTP atau KK'); return; }
-  
-  generatedID = String(Math.floor(1000 + Math.random() * 9000));
-  generatedPass = String(Math.floor(100000 + Math.random() * 900000));
-  document.getElementById('displayID').textContent = generatedID;
-  document.getElementById('displayPass').textContent = generatedPass;
-  showPage('page-karyawan-step2');
+function generateUniqueID(){
+  // Timestamp 3 digit terakhir + 3 digit random = 6 karakter, jauh lebih unik dari 4 digit acak
+  const ts=Date.now().toString().slice(-3);
+  const rnd=String(Math.floor(100+Math.random()*900));
+  return ts+rnd;
 }
-
-function showStep3() {
-  const nama = document.getElementById('namaLengkap').value.trim();
-  const alamat = document.getElementById('alamatKTP').value.trim();
-  const noKTP = document.getElementById('noKTP').value.trim();
-  const cabang = document.getElementById('cabang').value;
-  const today = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
-  
-  document.getElementById('contractPreview').innerHTML = `<h4>KONTRAK KERJA KARYAWAN</h4><p><strong>Tanggal:</strong> ${today}</p><p><strong>Nama:</strong> ${nama}</p><p><strong>Alamat:</strong> ${alamat}</p><p><strong>No. KTP:</strong> ${noKTP}</p><p><strong>Cabang:</strong> ${cabang}</p><p>Saya setuju dengan semua ketentuan yang berlaku.</p>`;
-  
-  showPage('page-karyawan-step3');
-  initSignaturePad();
+function validateStep1(){
+  const nama=document.getElementById('s1-nama').value.trim();
+  const alamat=document.getElementById('s1-alamat').value.trim();
+  const ktp=document.getElementById('s1-ktp').value.trim();
+  const wa=document.getElementById('s1-wa').value.trim();
+  const cab=document.getElementById('s1-cabang').value;
+  if(!nama||!alamat||!ktp||!wa||!cab){showToast('Lengkapi semua field yang wajib');return;}
+  if(ktp.length<16){showToast('No. KTP harus 16 digit');return;}
+  if(!files.foto){showToast('Foto diri wajib diupload');return;}
+  if(!files.ktp&&!files.kk){showToast('Upload KTP atau KK terlebih dahulu');return;}
+  genID=generateUniqueID();
+  genPass=String(Math.floor(100000+Math.random()*900000));
+  document.getElementById('disp-id').textContent=genID;
+  document.getElementById('disp-pass').textContent=genPass;
+  go('p-step2');
 }
-
-let signatureCanvas, signatureCtx, isDrawing = false;
-
-function initSignaturePad() {
-  signatureCanvas = document.getElementById('signaturePad');
-  signatureCtx = signatureCanvas.getContext('2d');
-  signatureCtx.strokeStyle = '#333';
-  signatureCtx.lineWidth = 2;
-  signatureCtx.lineCap = 'round';
-  signatureCanvas.addEventListener('mousedown', () => isDrawing = true);
-  signatureCanvas.addEventListener('mousemove', (e) => {
-    if (!isDrawing) return;
-    const rect = signatureCanvas.getBoundingClientRect();
-    signatureCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-    signatureCtx.stroke();
-  });
-  signatureCanvas.addEventListener('mouseup', () => { isDrawing = false; signatureCtx.beginPath(); });
-  signatureCanvas.addEventListener('touchstart', () => isDrawing = true);
-  signatureCanvas.addEventListener('touchmove', (e) => {
-    if (!isDrawing) return;
-    const rect = signatureCanvas.getBoundingClientRect();
-    const touch = e.touches[0];
-    signatureCtx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
-    signatureCtx.stroke();
-  });
-  signatureCanvas.addEventListener('touchend', () => { isDrawing = false; signatureCtx.beginPath(); });
+function showStep3(){
+  const nama=document.getElementById('s1-nama').value.trim();
+  const alamat=document.getElementById('s1-alamat').value.trim();
+  const noKTP=document.getElementById('s1-ktp').value.trim();
+  const cabang=document.getElementById('s1-cabang').value;
+  const today=new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('contractText').innerHTML=`
+    <h4>KONTRAK KERJA KARYAWAN</h4>
+    <p><strong>Tanggal:</strong> ${today}</p>
+    <p><strong>Nama:</strong> ${nama}</p>
+    <p><strong>Alamat:</strong> ${alamat}</p>
+    <p><strong>No. KTP:</strong> ${noKTP}</p>
+    <p><strong>Cabang:</strong> ${cabang}</p>
+    <p><strong>ID Karyawan:</strong> ${genID}</p>
+    <p style="margin-top:10px;">Dengan ini saya menyatakan bersedia bekerja sesuai ketentuan dan peraturan yang berlaku di Steam MP 7000.</p>`;
+  go('p-step3');
+  initSig();
 }
-
-function clearSignature() {
-  signatureCtx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
+function initSig(){
+  sigCanvas=document.getElementById('signaturePad');
+  sigCtx=sigCanvas.getContext('2d');
+  sigCtx.strokeStyle='#111';sigCtx.lineWidth=2;sigCtx.lineCap='round';
+  const pos=e=>{const r=sigCanvas.getBoundingClientRect(),s=e.touches?e.touches[0]:e;return[s.clientX-r.left,s.clientY-r.top];};
+  sigCanvas.addEventListener('mousedown',e=>{drawing=true;const[x,y]=pos(e);sigCtx.moveTo(x,y);});
+  sigCanvas.addEventListener('mousemove',e=>{if(!drawing)return;const[x,y]=pos(e);sigCtx.lineTo(x,y);sigCtx.stroke();});
+  sigCanvas.addEventListener('mouseup',()=>{drawing=false;sigCtx.beginPath();});
+  sigCanvas.addEventListener('mouseleave',()=>{drawing=false;sigCtx.beginPath();});
+  sigCanvas.addEventListener('touchstart',e=>{e.preventDefault();drawing=true;const[x,y]=pos(e);sigCtx.moveTo(x,y);},{passive:false});
+  sigCanvas.addEventListener('touchmove',e=>{if(!drawing)return;e.preventDefault();const[x,y]=pos(e);sigCtx.lineTo(x,y);sigCtx.stroke();},{passive:false});
+  sigCanvas.addEventListener('touchend',()=>{drawing=false;sigCtx.beginPath();});
 }
+function clearSig(){if(sigCtx)sigCtx.clearRect(0,0,sigCanvas.width,sigCanvas.height);}
 
-async function finalSubmit() {
-  const dataUrl = signatureCanvas.toDataURL();
-  if (dataUrl.includes('base64,iVBO')) { showToast('Tanda tangan wajib'); return; }
-  
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Memproses...';
-  
-  const payload = {
-    action: 'submitRegistration',
-    id: generatedID,
-    password: generatedPass,
-    namaLengkap: document.getElementById('namaLengkap').value.trim(),
-    alamatKTP: document.getElementById('alamatKTP').value.trim(),
-    noKTP: document.getElementById('noKTP').value.trim(),
-    noWA: document.getElementById('noWA').value.trim(),
-    cabang: document.getElementById('cabang').value,
-    fotoDiri: uploadedFiles.foto,
-    fotoKTP: uploadedFiles.ktp,
-    fotoKK: uploadedFiles.kk,
-    tanda_tangan: dataUrl
+async function finalSubmit(){
+  const blank=document.createElement('canvas');blank.width=sigCanvas.width;blank.height=sigCanvas.height;
+  if(sigCanvas.toDataURL()===blank.toDataURL()){showToast('Tanda tangan wajib diisi');return;}
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Mengirim...';
+  const payload={
+    action:'daftarBaru',
+    idKaryawan:genID,
+    password:genPass,
+    namaLengkap:document.getElementById('s1-nama').value.trim(),
+    alamatKTP:document.getElementById('s1-alamat').value.trim(),
+    noKTP:document.getElementById('s1-ktp').value.trim(),
+    noWA:document.getElementById('s1-wa').value.trim(),
+    cabang:document.getElementById('s1-cabang').value,
+    fotoDiri:files.foto,
+    fotoKTP:files.ktp,
+    fotoKK:files.kk,
+    tanda_tangan:sigCanvas.toDataURL('image/png')
   };
-  
-  try {
-    await fetch(BACKEND_API_URL, { method: 'POST', body: JSON.stringify(payload), mode: 'no-cors' });
-    showPage('page-success');
-  } catch(e) {
-    showToast('Gagal mengirim data');
-    btn.disabled = false;
-    btn.innerHTML = 'Selesai ✅';
+  try{
+    await fetch(API,{method:'POST',body:JSON.stringify(payload),mode:'no-cors'});
+    go('p-success');
+  }catch(e){
+    showToast('Gagal mengirim, coba lagi');
+    btn.disabled=false;btn.innerHTML='Selesai & Kirim ✅';
   }
 }
 
-async function loadOwnerData() {
-  try {
-    const response = await fetch(BACKEND_API_URL + '?action=getRequests', { mode: 'no-cors' });
-    const data = await response.json();
-    renderOwnerTable(data.requests || []);
-  } catch(e) {
-    document.getElementById('ownerTableContainer').innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div><div>Gagal memuat</div></div>';
+async function submitLupaID(){
+  const nama=document.getElementById('li-nama').value.trim();
+  const wa=document.getElementById('li-wa').value.trim();
+  const cab=document.getElementById('li-cabang').value;
+  if(!nama||!wa||!cab){showToast('Lengkapi semua field');return;}
+  const btn=document.getElementById('lupaBtn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Mengirim...';
+  const payload={action:'lupaID',namaLengkap:nama,noWA:wa,cabang:cab};
+  try{
+    await fetch(API,{method:'POST',body:JSON.stringify(payload),mode:'no-cors'});
+    go('p-success-lupa');
+  }catch(e){
+    showToast('Gagal mengirim, coba lagi');
+    btn.disabled=false;btn.innerHTML='Kirim Pengajuan';
   }
 }
 
-function renderOwnerTable(requests) {
-  if (!requests || requests.length === 0) {
-    document.getElementById('ownerTableContainer').innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div>Tidak ada pengajuan</div></div>';
-    return;
+async function loadPengajuan(){
+  document.getElementById('tbl-pengajuan').innerHTML='<div class="empty-state"><div class="empty-icon">⏳</div><div>Memuat...</div></div>';
+  try{
+    const res=await fetch(API+'?action=getPengajuan');
+    const data=await res.json();
+    renderPengajuan(data.pengajuan||[]);
+  }catch(e){
+    document.getElementById('tbl-pengajuan').innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div><div>Gagal memuat. Coba refresh.</div></div>';
   }
-  let html = '<div class="table-wrapper"><table class="data-table"><thead><tr><th>No</th><th>Nama</th><th>WhatsApp</th><th>Cabang</th><th>Aksi</th></tr></thead><tbody>';
-  requests.forEach((req, idx) => {
-    html += `<tr><td>${idx + 1}</td><td>${req.namaLengkap || '-'}</td><td>${req.noWA || '-'}</td><td>${req.cabang || '-'}</td><td><button class="btn btn-primary btn-sm" onclick="alert('Disetujui!')">✓ Setujui</button></td></tr>`;
+}
+
+function renderPengajuan(list){
+  if(!list.length){
+    document.getElementById('tbl-pengajuan').innerHTML='<div class="empty-state"><div class="empty-icon">📭</div><div>Tidak ada pengajuan lupa ID</div></div>';return;
+  }
+  let html='<div class="table-wrap"><table class="data-table"><thead><tr><th>#</th><th>Nama</th><th>WA</th><th>Cabang</th><th>Status</th><th>Aksi</th></tr></thead><tbody>';
+  list.forEach((r,i)=>{
+    html+=`<tr>
+      <td>${i+1}</td>
+      <td>${r.namaLengkap||'-'}</td>
+      <td>${r.noWA||'-'}</td>
+      <td>${r.cabang||'-'}</td>
+      <td><span class="badge badge-pending">${r.status||'Pending'}</span></td>
+      <td style="display:flex;gap:5px;flex-wrap:wrap;">
+        <button class="btn btn-success btn-sm" onclick="approveRow(${r.rowIndex},'${(r.namaLengkap||'').replace(/'/g,"\\'")}','${r.noWA||''}','${r.cabang||''}')">✓ Setujui</button>
+        <button class="btn btn-danger btn-sm" onclick="rejectRow(${r.rowIndex})">✕ Tolak</button>
+      </td>
+    </tr>`;
   });
-  html += '</tbody></table></div>';
-  document.getElementById('ownerTableContainer').innerHTML = html;
+  html+='</tbody></table></div>';
+  document.getElementById('tbl-pengajuan').innerHTML=html;
 }
 
-function showToast(msg) {
-  const toast = document.createElement('div');
-  toast.className = 'toast';
-  toast.textContent = msg;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
+async function approveRow(rowIndex,nama,wa,cabang){
+  if(!confirm(`Setujui pengajuan lupa ID dari ${nama}?`))return;
+  showToast('Memproses persetujuan...');
+  const payload={action:'approve',rowIndex,namaLengkap:nama,noWA:wa,cabang};
+  try{
+    const res=await fetch(API,{method:'POST',body:JSON.stringify(payload),mode:'no-cors'});
+    showToast('✅ Disetujui! Kredensial baru terkirim via Telegram.');
+    setTimeout(loadPengajuan,1500);
+  }catch(e){showToast('Gagal approve, coba lagi');}
+}
+
+async function rejectRow(rowIndex){
+  if(!confirm('Tolak dan hapus pengajuan ini?'))return;
+  const payload={action:'reject',rowIndex};
+  try{
+    await fetch(API,{method:'POST',body:JSON.stringify(payload),mode:'no-cors'});
+    showToast('Pengajuan ditolak dan dihapus.');
+    setTimeout(loadPengajuan,1500);
+  }catch(e){showToast('Gagal reject, coba lagi');}
+}
+
+function switchTab(t){
+  document.getElementById('tab-lupa').classList.toggle('active',t==='lupa');
+  document.getElementById('tab-master').classList.toggle('active',t==='master');
+  document.getElementById('panel-lupa').style.display=t==='lupa'?'block':'none';
+  document.getElementById('panel-master').style.display=t==='master'?'block':'none';
+}
+
+function showToast(msg){
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  document.body.appendChild(t);setTimeout(()=>t.remove(),3000);
 }
 </script>
 
