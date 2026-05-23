@@ -10,65 +10,68 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-/* ========== DESIGN TOKENS ========== */
+/* ========== DESIGN TOKENS (SIMPLIFIED RED-WHITE) ========== */
 :root {
-  --red-deep:   #8B0000;   /* merah hati gelap */
-  --red-core:   #B00020;   /* merah hati utama */
-  --red-mid:    #C8002A;
-  --red-light:  #F5C6CB;
-  --red-pale:   #FDF0F2;   /* nyaris putih kemerahan */
+  --red-deep:   #C41E3A;   /* merah elegan */
+  --red-core:   #DC143C;   /* merah cerah tapi lembut */
+  --red-mid:    #E63946;   /* merah medium */
+  --red-light:  #F4A9B8;   /* merah muda lembut */
+  --red-pale:   #FCE8EB;   /* merah sangat pucat */
   --white:      #FFFFFF;
-  --off-white:  #FFF8F8;
-  --gold:       #C9A84C;   /* emas tua elegan */
-  --gold-light: #E8C870;
-  --gold-dark:  #9A7230;
-  --gold-pale:  #FDF6E3;
-  --text-dark:  #1A0005;
-  --text-mid:   #5A2030;
-  --text-muted: #9B6070;
-  --border:     #E8C5CB;
-  --border-gold:#D4B060;
-  --success:    #1B7A4A;
-  --danger:     #CC1A2E;
-  --surface:    #FDF5F6;
+  --off-white:  #FAFAFA;
+  --accent:     #DC143C;   /* gunakan merah sebagai aksen utama */
+  --accent-light: #F4A9B8;
+  --accent-dark: #9B1D28;
+  --text-dark:  #2D2D2D;   /* abu gelap */
+  --text-mid:   #5A5A5A;   /* abu medium */
+  --text-muted: #888888;   /* abu terang */
+  --border:     #E8D5D9;   /* border lembut */
+  --surface:    #FFFBFC;   /* surface putih kemerahan */
+  --success:    #2D7A4A;
+  --danger:     #C41E3A;
 }
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  background: linear-gradient(175deg, var(--red-core) 0%, #D4003A 12%, #E8405A 28%, #F5A0A8 52%, #FDE0E4 72%, var(--white) 100%);
+  background: linear-gradient(180deg, #FFFFFF 0%, #FCE8EB 50%, #FEF5F7 100%);
   background-attachment: fixed;
   color: var(--text-dark);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
+
 h1,h2,h3,h4 { font-family: 'Playfair Display', serif; }
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--red-pale); }
-::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
 
 /* ── TOP BAR ── */
 .top-bar {
-  background: linear-gradient(90deg, var(--red-deep) 0%, var(--red-core) 60%, #A0001E 100%);
+  background: linear-gradient(90deg, var(--red-deep) 0%, var(--red-core) 100%);
   color: white;
   padding: 12px 20px;
   display: flex; align-items: center; gap: 14px;
   position: sticky; top: 0; z-index: 100;
-  box-shadow: 0 3px 20px rgba(139,0,0,0.45);
-  border-bottom: 2px solid var(--gold);
+  box-shadow: 0 2px 12px rgba(196, 30, 58, 0.2);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
+
 .logo-mark {
   width: 42px; height: 42px; border-radius: 12px;
-  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold-dark) 100%);
+  background: linear-gradient(135deg, #FFFFFF 0%, #F4A9B8 100%);
   display: flex; align-items: center; justify-content: center;
   font-family: 'Playfair Display', serif; font-weight: 800; font-size: 15px;
   color: var(--red-deep); flex-shrink: 0;
-  box-shadow: 0 2px 10px rgba(201,168,76,0.5);
+  box-shadow: 0 2px 8px rgba(196, 30, 58, 0.15);
 }
+
 .top-bar-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; letter-spacing: 0.2px; }
-.top-bar-sub { font-size: 11px; opacity: 0.65; font-weight: 300; margin-top: 1px; }
+.top-bar-sub { font-size: 11px; opacity: 0.7; font-weight: 300; margin-top: 1px; }
 .top-bar-ornament { margin-left: auto; font-size: 18px; opacity: 0.4; }
 
 /* ── PAGES ── */
@@ -78,28 +81,31 @@ main { flex: 1; }
 
 /* ── GLASS CARD ── */
 .card {
-  background: rgba(255,255,255,0.88);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(201,168,76,0.3);
-  border-radius: 18px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(196, 30, 58, 0.15);
+  border-radius: 16px;
   padding: 24px;
   margin: 14px 16px;
   max-width: 600px; margin-left: auto; margin-right: auto;
-  box-shadow: 0 4px 24px rgba(139,0,0,0.08), 0 1px 0 rgba(255,255,255,0.9) inset;
+  box-shadow: 0 2px 12px rgba(196, 30, 58, 0.08);
 }
-.card-gold-top { border-top: 3px solid var(--gold); }
+
+.card-gold-top { border-top: 3px solid var(--accent); }
 
 /* ── SECTION HEADER ── */
 .section-header {
   padding: 20px 20px 0;
   max-width: 640px; margin: 0 auto;
 }
+
 .section-title {
   font-family: 'Playfair Display', serif;
   font-size: 22px; font-weight: 700;
   color: var(--red-deep); margin-bottom: 3px;
 }
+
 .section-sub { font-size: 13px; color: var(--text-muted); }
 
 /* ── BACK BUTTON ── */
@@ -109,65 +115,76 @@ main { flex: 1; }
   cursor: pointer; padding: 8px 0; transition: color 0.2s;
   background: none; border: none; margin-bottom: 8px;
 }
+
 .back-btn:hover { color: var(--red-core); }
 
 /* ── HERO ── */
 .hero-section {
-  background: linear-gradient(160deg, var(--red-deep) 0%, var(--red-core) 45%, #C8003A 100%);
+  background: linear-gradient(135deg, var(--red-deep) 0%, var(--red-core) 100%);
   color: white; text-align: center;
-  padding: 52px 24px 48px;
+  padding: 48px 24px 44px;
   position: relative; overflow: hidden;
 }
+
 .hero-section::before {
   content: '';
   position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse 60% 50% at 80% 20%, rgba(201,168,76,0.22) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 60% at 15% 85%, rgba(255,255,255,0.08) 0%, transparent 60%);
+    radial-gradient(ellipse 50% 40% at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 50% at 15% 85%, rgba(255,255,255,0.05) 0%, transparent 60%);
 }
+
 .hero-section::after {
   content: '';
   position: absolute; bottom: 0; left: 0; right: 0;
-  height: 60px;
-  background: linear-gradient(to bottom, transparent, rgba(255,240,242,0.3));
+  height: 40px;
+  background: linear-gradient(to bottom, transparent, rgba(252,232,235,0.2));
 }
+
 .hero-section > * { position: relative; z-index: 1; }
 
 .hero-ornament {
   display: flex; align-items: center; justify-content: center; gap: 10px;
   margin-bottom: 20px;
 }
+
 .ornament-line {
   width: 40px; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold-light));
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6));
 }
-.ornament-line.right { background: linear-gradient(90deg, var(--gold-light), transparent); }
+
+.ornament-line.right { background: linear-gradient(90deg, rgba(255,255,255,0.6), transparent); }
+
 .ornament-diamond {
-  width: 8px; height: 8px; background: var(--gold-light);
+  width: 8px; height: 8px; background: rgba(255,255,255,0.8);
   transform: rotate(45deg);
 }
+
 .hero-badge {
   display: inline-block;
-  background: rgba(201,168,76,0.18); border: 1px solid rgba(201,168,76,0.5);
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
   padding: 5px 16px; border-radius: 999px;
   font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-  font-weight: 600; color: var(--gold-light);
+  font-weight: 600; color: rgba(255,255,255,0.9);
 }
+
 .hero-title {
   font-family: 'Playfair Display', serif;
   font-size: clamp(28px, 7vw, 44px); font-weight: 800;
   line-height: 1.12; margin: 14px 0 10px;
-  text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  text-shadow: 0 1px 12px rgba(0,0,0,0.15);
 }
-.hero-sub { font-size: 14px; opacity: 0.75; font-weight: 300; max-width: 340px; margin: 0 auto; line-height: 1.6; }
+
+.hero-sub { font-size: 14px; opacity: 0.8; font-weight: 300; max-width: 340px; margin: 0 auto; line-height: 1.6; }
 
 /* ── GOLD DIVIDER ── */
 .gold-divider {
   display: flex; align-items: center; gap: 10px;
   margin: 22px auto 0; width: 80%; max-width: 300px;
 }
-.gold-divider-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,168,76,0.6), transparent); }
-.gold-divider-star { color: var(--gold-light); font-size: 12px; }
+
+.gold-divider-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent); }
+.gold-divider-star { color: rgba(255,255,255,0.7); font-size: 12px; }
 
 /* ── MENU CARDS ── */
 .menu-grid {
@@ -175,107 +192,127 @@ main { flex: 1; }
   gap: 16px; padding: 28px 16px 20px;
   max-width: 520px; margin: 0 auto;
 }
+
 @media(max-width: 400px){ .menu-grid { grid-template-columns: 1fr; } }
 
 .menu-card {
-  background: rgba(255,255,255,0.92);
-  border: 1px solid rgba(201,168,76,0.25);
-  border-radius: 20px; padding: 28px 16px 22px; text-align: center;
+  background: linear-gradient(135deg, #FFFFFF 0%, #FEF5F7 100%);
+  border: 1.5px solid rgba(196, 30, 58, 0.2);
+  border-radius: 16px; padding: 28px 16px 22px; text-align: center;
   cursor: pointer;
   transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s;
-  box-shadow: 0 4px 20px rgba(139,0,0,0.1);
+  box-shadow: 0 2px 12px rgba(196, 30, 58, 0.08);
   position: relative; overflow: hidden;
 }
+
 .menu-card::before {
   content: '';
   position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, var(--gold-dark), var(--gold-light), var(--gold-dark));
+  background: linear-gradient(90deg, var(--red-deep), var(--red-core));
 }
+
 .menu-card:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 16px 40px rgba(139,0,0,0.18), 0 0 0 1px rgba(201,168,76,0.4);
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 8px 24px rgba(196, 30, 58, 0.15);
 }
-.menu-card-icon { font-size: 38px; margin-bottom: 14px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
+
+.menu-card-icon { font-size: 38px; margin-bottom: 14px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1)); }
+
 .menu-card-title {
   font-family: 'Playfair Display', serif;
   font-size: 16px; font-weight: 700;
   color: var(--red-deep); margin-bottom: 6px;
 }
+
 .menu-card-desc { font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+
 .menu-card-badge {
   position: absolute; top: 14px; right: 14px;
   font-size: 9px; font-weight: 700; letter-spacing: 0.8px;
   padding: 3px 8px; border-radius: 999px; text-transform: uppercase;
 }
-.badge-red { background: rgba(176,0,32,0.1); color: var(--red-core); border: 1px solid rgba(176,0,32,0.2); }
-.badge-gold { background: rgba(201,168,76,0.12); color: var(--gold-dark); border: 1px solid rgba(201,168,76,0.35); }
+
+.badge-red { background: rgba(196, 30, 58, 0.1); color: var(--red-core); border: 1px solid rgba(196, 30, 58, 0.2); }
+.badge-gold { background: rgba(196, 30, 58, 0.08); color: var(--red-deep); border: 1px solid rgba(196, 30, 58, 0.15); }
 
 /* ── STEPPER ── */
 .stepper-wrap {
   display: flex; align-items: center;
-  background: rgba(255,255,255,0.88);
-  border: 1px solid rgba(201,168,76,0.3);
-  border-radius: 16px; padding: 14px 12px;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid rgba(196, 30, 58, 0.15);
+  border-radius: 14px; padding: 14px 12px;
   margin: 12px 16px 0; max-width: 600px;
   margin-left: auto; margin-right: auto;
-  box-shadow: 0 2px 12px rgba(139,0,0,0.06);
+  box-shadow: 0 2px 8px rgba(196, 30, 58, 0.05);
 }
+
 .step { display: flex; flex-direction: column; align-items: center; flex: 1; }
+
 .step-circle {
   width: 32px; height: 32px; border-radius: 50%;
-  background: #EDD5D9; color: var(--text-muted);
+  background: #F0E5E8; color: var(--text-muted);
   display: flex; align-items: center; justify-content: center;
   font-size: 13px; font-weight: 700;
   font-family: 'Playfair Display', serif;
   transition: all 0.3s;
 }
+
 .step.active .step-circle {
   background: linear-gradient(135deg, var(--red-core), var(--red-deep));
   color: white;
-  box-shadow: 0 0 0 4px rgba(176,0,32,0.15);
+  box-shadow: 0 0 0 4px rgba(196, 30, 58, 0.12);
 }
+
 .step.done .step-circle {
-  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  background: linear-gradient(135deg, var(--accent-light), var(--red-mid));
   color: white;
 }
+
 .step-label { font-size: 10px; color: var(--text-muted); margin-top: 5px; text-align: center; font-weight: 500; }
 .step.active .step-label { color: var(--red-core); font-weight: 600; }
-.step.done .step-label { color: var(--gold-dark); }
-.step-line { flex: 1; height: 2px; background: #EDD5D9; margin-top: -16px; }
-.step-line.done { background: linear-gradient(90deg, var(--gold), var(--gold-dark)); }
+.step.done .step-label { color: var(--red-mid); }
+.step-line { flex: 1; height: 2px; background: #F0E5E8; margin-top: -16px; }
+.step-line.done { background: linear-gradient(90deg, var(--accent-light), var(--red-mid)); }
 
 /* ── FORMS ── */
 .form-group { margin-bottom: 16px; }
+
 .form-label {
   display: block; font-size: 12px; font-weight: 600;
   color: var(--red-deep); margin-bottom: 6px; letter-spacing: 0.4px;
 }
+
 .form-label .req { color: var(--danger); margin-left: 2px; }
+
 .form-section-label {
-  font-size: 11px; font-weight: 700; color: var(--gold-dark);
-  text-transform: uppercase; letter-spacing: 1.5px;
+  font-size: 11px; font-weight: 700; color: var(--red-deep);
+  text-transform: uppercase; letter-spacing: 1.2px;
   margin-bottom: 14px; margin-top: 4px;
   display: flex; align-items: center; gap: 8px;
 }
+
 .form-section-label::before, .form-section-label::after {
   content: ''; flex: 1; height: 1px;
-  background: linear-gradient(90deg, rgba(201,168,76,0.4), transparent);
+  background: linear-gradient(90deg, rgba(196, 30, 58, 0.3), transparent);
 }
-.form-section-label::after { background: linear-gradient(270deg, rgba(201,168,76,0.4), transparent); }
+
+.form-section-label::after { background: linear-gradient(270deg, rgba(196, 30, 58, 0.3), transparent); }
 
 .form-input, .form-select, .form-textarea {
   width: 100%; padding: 11px 14px;
   border: 1.5px solid var(--border); border-radius: 10px;
   font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: var(--text-dark);
-  background: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.85);
   transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
   outline: none;
 }
+
 .form-input:focus, .form-select:focus, .form-textarea:focus {
   border-color: var(--red-core);
-  box-shadow: 0 0 0 3px rgba(176,0,32,0.1);
+  box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.08);
   background: white;
 }
+
 .form-textarea { min-height: 80px; resize: vertical; }
 
 /* ── UPLOAD ZONE ── */
@@ -283,18 +320,20 @@ main { flex: 1; }
   border: 2px dashed var(--border); border-radius: 12px;
   padding: 20px; text-align: center; cursor: pointer;
   transition: all 0.2s; position: relative; overflow: hidden;
-  background: rgba(253,240,242,0.5);
+  background: rgba(252,232,235,0.4);
 }
+
 .upload-zone:hover {
-  border-color: var(--gold);
-  background: rgba(253,246,227,0.6);
+  border-color: var(--red-mid);
+  background: rgba(252,232,235,0.6);
 }
+
 .upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
 .upload-icon { font-size: 28px; margin-bottom: 6px; }
 .upload-label { font-size: 13px; color: var(--text-muted); font-weight: 400; }
 .upload-sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; opacity: 0.7; }
 .upload-preview { max-width: 100%; max-height: 100px; border-radius: 8px; margin-top: 8px; object-fit: cover; }
-.upload-name { font-size: 12px; color: var(--gold-dark); margin-top: 6px; font-weight: 600; }
+.upload-name { font-size: 12px; color: var(--red-deep); margin-top: 6px; font-weight: 600; }
 
 /* ── BUTTONS ── */
 .btn {
@@ -303,91 +342,109 @@ main { flex: 1; }
   font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; border: none;
   transition: all 0.22s; letter-spacing: 0.3px;
 }
+
 .btn-primary {
   background: linear-gradient(135deg, var(--red-core) 0%, var(--red-deep) 100%);
   color: white;
-  box-shadow: 0 4px 14px rgba(176,0,32,0.3);
-  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 3px 10px rgba(196, 30, 58, 0.2);
+  border: none;
 }
+
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--red-deep) 0%, #6B0000 100%);
+  background: linear-gradient(135deg, var(--red-deep) 0%, #A01529 100%);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(139,0,0,0.4);
+  box-shadow: 0 6px 16px rgba(196, 30, 58, 0.25);
 }
+
 .btn-gold {
-  background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 50%, var(--gold-dark) 100%);
-  color: var(--red-deep);
+  background: linear-gradient(135deg, var(--accent-light) 0%, var(--red-mid) 100%);
+  color: white;
   font-weight: 700;
-  box-shadow: 0 4px 14px rgba(201,168,76,0.35);
-  border: 1px solid rgba(255,255,255,0.3);
+  box-shadow: 0 3px 10px rgba(196, 30, 58, 0.15);
+  border: none;
 }
+
 .btn-gold:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(201,168,76,0.5);
+  box-shadow: 0 6px 16px rgba(196, 30, 58, 0.2);
 }
+
 .btn-outline {
-  background: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.8);
   color: var(--red-deep);
-  border: 1.5px solid var(--border-gold);
+  border: 1.5px solid rgba(196, 30, 58, 0.3);
 }
+
 .btn-outline:hover {
   border-color: var(--red-core);
   color: var(--red-core);
   background: white;
 }
+
 .btn-danger {
-  background: linear-gradient(135deg, #E53E3E, #C53030);
+  background: linear-gradient(135deg, #E63946, #C41E3A);
   color: white;
-  box-shadow: 0 3px 10px rgba(197,48,48,0.3);
+  box-shadow: 0 3px 10px rgba(196, 30, 58, 0.2);
 }
-.btn-danger:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(197,48,48,0.4); }
+
+.btn-danger:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(196, 30, 58, 0.25); }
+
 .btn-success {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
+  background: linear-gradient(135deg, #2D7A4A, #1F5533);
   color: white;
-  box-shadow: 0 3px 10px rgba(22,163,74,0.3);
+  box-shadow: 0 3px 10px rgba(45, 122, 74, 0.2);
 }
+
 .btn-success:hover { transform: translateY(-1px); }
+
 .btn-sm { padding: 7px 14px; font-size: 12px; border-radius: 8px; }
 .btn-full { width: 100%; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
 
 /* ── CREDENTIAL BOX ── */
 .credential-box {
-  background: linear-gradient(145deg, var(--red-deep) 0%, #6B0000 100%);
+  background: linear-gradient(135deg, var(--red-deep) 0%, var(--red-core) 100%);
   color: white; border-radius: 16px; padding: 28px 24px;
   text-align: center; margin-bottom: 20px;
-  border: 1px solid rgba(201,168,76,0.3);
-  box-shadow: 0 8px 32px rgba(139,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 6px 24px rgba(196, 30, 58, 0.2);
   position: relative; overflow: hidden;
 }
+
 .credential-box::before {
   content: '';
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 80% 20%, rgba(201,168,76,0.15), transparent 60%);
+  background: radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.08), transparent 60%);
 }
+
 .credential-box > * { position: relative; z-index: 1; }
+
 .cred-label {
   font-size: 10px; text-transform: uppercase; letter-spacing: 2px;
-  opacity: 0.6; margin-bottom: 6px; font-weight: 500;
+  opacity: 0.7; margin-bottom: 6px; font-weight: 500;
 }
+
 .cred-value {
   font-family: 'Playfair Display', serif;
   font-size: 40px; font-weight: 800; letter-spacing: 6px;
-  color: var(--gold-light);
-  text-shadow: 0 2px 10px rgba(201,168,76,0.4);
+  color: #FFFFFF;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.2);
 }
+
 .cred-separator {
   width: 60px; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.5), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
   margin: 18px auto;
 }
+
 .cred-warning {
-  background: rgba(253,246,227,0.95);
-  border: 1.5px solid var(--gold);
+  background: rgba(255,255,255,0.95);
+  border: 1.5px solid rgba(196, 30, 58, 0.3);
   border-radius: 12px; padding: 14px 16px;
-  font-size: 13px; color: #5A3E00; font-weight: 500; line-height: 1.6;
+  font-size: 13px; color: #333; font-weight: 500; line-height: 1.6;
   margin-top: 18px; text-align: left;
 }
+
 .cred-warning strong { display: block; margin-bottom: 4px; color: var(--red-deep); font-size: 14px; font-family: 'Playfair Display', serif; }
 
 /* ── SIGNATURE PAD ── */
@@ -403,6 +460,7 @@ main { flex: 1; }
   padding: 20px; font-size: 12px; line-height: 1.85; color: #333;
   max-height: 300px; overflow-y: auto;
 }
+
 #contractPreview h4 {
   text-align: center; font-size: 14px; margin-bottom: 12px;
   color: var(--red-deep); font-family: 'Playfair Display', serif;
@@ -411,24 +469,30 @@ main { flex: 1; }
 /* ── PIN MODAL ── */
 .modal-overlay {
   position: fixed; inset: 0;
-  background: rgba(80,0,10,0.65); backdrop-filter: blur(6px);
+  background: rgba(60,60,60,0.5); backdrop-filter: blur(6px);
   z-index: 200; display: flex; align-items: center; justify-content: center;
   padding: 20px;
 }
+
 .modal-box {
-  background: white; border-radius: 24px; padding: 36px 28px;
+  background: white; border-radius: 20px; padding: 36px 28px;
   width: 100%; max-width: 360px; text-align: center;
-  box-shadow: 0 28px 80px rgba(139,0,0,0.35);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
   animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
-  border-top: 4px solid var(--gold);
+  border-top: 4px solid var(--red-core);
 }
+
 @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
 .pin-icon { font-size: 48px; margin-bottom: 12px; }
+
 .pin-title {
   font-family: 'Playfair Display', serif;
   font-size: 22px; font-weight: 700; color: var(--red-deep); margin-bottom: 6px;
 }
+
 .pin-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+
 .pin-input {
   width: 100%; padding: 14px; text-align: center;
   font-size: 26px; letter-spacing: 10px; font-weight: 700;
@@ -436,29 +500,36 @@ main { flex: 1; }
   font-family: 'Playfair Display', serif; outline: none; margin-bottom: 16px;
   color: var(--red-deep);
 }
-.pin-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.15); }
+
+.pin-input:focus { border-color: var(--red-core); box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1); }
+
 .pin-error { color: var(--danger); font-size: 13px; margin-bottom: 12px; display: none; font-weight: 500; }
 
 /* ── OWNER DASHBOARD ── */
 .owner-header {
-  background: linear-gradient(135deg, var(--red-deep) 0%, #5C0012 60%, #3D0000 100%);
+  background: linear-gradient(135deg, var(--red-deep) 0%, var(--red-core) 100%);
   color: white; padding: 32px 20px;
   position: relative; overflow: hidden;
-  border-bottom: 2px solid var(--gold);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
+
 .owner-header::before {
   content: '';
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 75% 40%, rgba(201,168,76,0.25), transparent 60%);
+  background: radial-gradient(ellipse at 75% 40%, rgba(255,255,255,0.08), transparent 60%);
 }
+
 .owner-header > * { position: relative; z-index: 1; }
+
 .owner-badge {
   display: inline-block;
-  background: linear-gradient(135deg, var(--gold-light), var(--gold));
-  color: var(--red-deep); font-size: 10px; font-weight: 700;
+  background: rgba(255,255,255,0.2);
+  color: white; font-size: 10px; font-weight: 700;
   padding: 4px 12px; border-radius: 999px;
   text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 10px;
+  border: 1px solid rgba(255,255,255,0.3);
 }
+
 .owner-title {
   font-family: 'Playfair Display', serif;
   font-size: 24px; font-weight: 800;
@@ -466,28 +537,31 @@ main { flex: 1; }
 
 /* ── TABLE ── */
 .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
 .data-table th {
-  background: linear-gradient(90deg, var(--red-deep), #9B0018);
+  background: linear-gradient(90deg, var(--red-deep), var(--red-core));
   color: white; padding: 11px 12px; text-align: left;
   font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase;
 }
+
 .data-table th:first-child { border-radius: 0; }
 .data-table td { padding: 12px; border-bottom: 1px solid var(--red-light); vertical-align: middle; }
 .data-table tr:last-child td { border-bottom: none; }
-.data-table tr:hover td { background: rgba(253,240,242,0.6); }
+.data-table tr:hover td { background: rgba(252,232,235,0.5); }
+
 .table-wrapper {
   overflow-x: auto; border-radius: 14px;
-  border: 1px solid rgba(201,168,76,0.3);
-  box-shadow: 0 4px 16px rgba(139,0,0,0.08);
+  border: 1px solid rgba(196, 30, 58, 0.15);
+  box-shadow: 0 2px 8px rgba(196, 30, 58, 0.05);
 }
 
 /* ── STATUS PILL ── */
 .status-pill { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
-.status-pending { background: rgba(201,168,76,0.12); color: var(--gold-dark); border: 1px solid rgba(201,168,76,0.35); }
+.status-pending { background: rgba(252,232,235,0.6); color: var(--red-deep); border: 1px solid rgba(196, 30, 58, 0.25); }
 
 /* ── ALERTS ── */
 .alert { padding: 14px 16px; border-radius: 10px; font-size: 13px; margin-bottom: 16px; display: flex; align-items: flex-start; gap: 10px; }
-.alert-info { background: rgba(253,240,242,0.9); color: var(--red-deep); border: 1px solid var(--border); }
+.alert-info { background: rgba(252,232,235,0.8); color: var(--red-deep); border: 1px solid rgba(196, 30, 58, 0.25); }
 .alert-success { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
 .alert-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
 
@@ -496,7 +570,7 @@ main { flex: 1; }
 .gold-hr {
   border: none; margin: 16px 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  background: linear-gradient(90deg, transparent, rgba(196, 30, 58, 0.3), transparent);
 }
 
 /* ── LUPA LINK ── */
@@ -504,10 +578,11 @@ main { flex: 1; }
   font-size: 12px; color: var(--red-core);
   text-decoration: none; cursor: pointer;
   margin-top: 6px; display: inline-flex; align-items: center; gap: 4px;
-  font-weight: 600; border-bottom: 1px dashed rgba(176,0,32,0.4);
+  font-weight: 600; border-bottom: 1px dashed rgba(196, 30, 58, 0.3);
   transition: color 0.2s;
 }
-.lupa-link:hover { color: var(--gold-dark); border-color: var(--gold-dark); }
+
+.lupa-link:hover { color: var(--red-deep); border-color: var(--red-deep); }
 
 /* ── SUCCESS PAGE ── */
 .success-icon { font-size: 70px; margin-bottom: 16px; }
@@ -519,7 +594,7 @@ main { flex: 1; }
 
 /* ── EMPTY STATE ── */
 .empty-state { text-align: center; padding: 52px 20px; color: var(--text-muted); }
-.empty-state-icon { font-size: 52px; margin-bottom: 14px; opacity: 0.45; }
+.empty-state-icon { font-size: 52px; margin-bottom: 14px; opacity: 0.4; }
 .empty-state-text { font-size: 14px; }
 
 /* ── SPINNER ── */
@@ -533,25 +608,25 @@ main { flex: 1; }
 /* ── TOAST ── */
 .toast {
   position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-  background: linear-gradient(135deg, var(--red-deep), #6B0000);
+  background: linear-gradient(135deg, var(--red-deep), var(--red-core));
   color: white; padding: 12px 24px; border-radius: 10px;
   font-size: 13px; font-weight: 500; z-index: 999;
   animation: toastIn 0.3s ease, toastOut 0.3s ease 2.5s forwards;
   pointer-events: none; white-space: nowrap;
-  border: 1px solid rgba(201,168,76,0.35);
-  box-shadow: 0 8px 24px rgba(139,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 6px 16px rgba(196, 30, 58, 0.2);
 }
 @keyframes toastIn { from { opacity:0; transform: translateX(-50%) translateY(10px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
 @keyframes toastOut { to { opacity:0; transform: translateX(-50%) translateY(10px); } }
 
 /* ── FOOTER ── */
 footer {
-  background: linear-gradient(90deg, var(--red-deep), #6B0000, var(--red-deep));
-  color: rgba(255,255,255,0.55); text-align: center;
+  background: linear-gradient(90deg, var(--red-deep) 0%, var(--red-core) 100%);
+  color: rgba(255,255,255,0.65); text-align: center;
   padding: 16px; font-size: 12px; margin-top: auto;
-  border-top: 1px solid rgba(201,168,76,0.4);
+  border-top: 1px solid rgba(255,255,255,0.1);
 }
-footer strong { color: var(--gold-light); font-family: 'Playfair Display', serif; font-size: 13px; }
+footer strong { color: white; font-family: 'Playfair Display', serif; font-size: 13px; }
 
 /* ── UTILITY ── */
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -841,7 +916,7 @@ footer strong { color: var(--gold-light); font-family: 'Playfair Display', serif
   <main style="display:flex; align-items:center; justify-content:center; padding:48px 20px;">
     <div style="text-align:center; max-width:380px;">
       <div class="success-icon">📨</div>
-      <div class="success-title" style="color:var(--gold-dark);">Pengajuan Terkirim!</div>
+      <div class="success-title" style="color:#E63946;">Pengajuan Terkirim!</div>
       <p class="success-sub">Pengajuan lupa ID Anda sudah diterima. Owner akan memproses dan mengirimkan ID &amp; Password baru ke WhatsApp Anda.</p>
       <div style="margin-top:28px;">
         <button class="btn btn-primary" onclick="showPage('page-landing')">← Kembali ke Menu Utama</button>
@@ -857,8 +932,8 @@ footer strong { color: var(--gold-light); font-family: 'Playfair Display', serif
     <div class="owner-header">
       <div class="owner-badge">⚜ Owner Access</div>
       <div class="owner-title">Dashboard Owner</div>
-      <div style="font-size:13px; opacity:0.6; margin-top:4px;">Kelola pengajuan lupa ID karyawan</div>
-      <button class="btn btn-outline btn-sm" style="margin-top:18px; color:rgba(255,255,255,0.75); border-color:rgba(201,168,76,0.4);" onclick="showPage('page-landing')">← Keluar</button>
+      <div style="font-size:13px; opacity:0.65; margin-top:4px;">Kelola pengajuan lupa ID karyawan</div>
+      <button class="btn btn-outline btn-sm" style="margin-top:18px; color:rgba(255,255,255,0.75); border-color:rgba(196,30,58,0.3);" onclick="showPage('page-landing')">← Keluar</button>
     </div>
 
     <div style="padding:20px 16px; max-width:820px; margin:0 auto;">
@@ -998,188 +1073,147 @@ function buildContract() {
 
   document.getElementById('contractPreview').innerHTML = `
     <h4>SURAT PERJANJIAN KONTRAK KERJA KARYAWAN</h4>
-    <p style="text-align:center; margin-bottom:14px; font-weight:600; font-size:11px;">Nomor: 030/STMP/SPK/VI/2025</p>
-    <p><strong>PIHAK PERTAMA (Owner / Pemberi Kerja):</strong><br>
-    Nama: Aldi Septiadi &nbsp;|&nbsp; Alamat: Tangerang &nbsp;|&nbsp; No. KTP: 3603272009020002</p>
-    <p style="margin-top:10px;"><strong>PIHAK KEDUA (Karyawan):</strong><br>
-    Nama: <strong>${nama}</strong><br>Alamat: ${alamat}<br>No. KTP: ${noKTP}<br>Cabang: ${cabang}</p>
-    <hr style="margin:12px 0; border:none; border-top:1px solid #eee;">
-    <p><strong>PASAL 1 — HUBUNGAN KERJA</strong><br>Pihak Pertama menerima Pihak Kedua sebagai karyawan kontrak di cabang ${cabang} terhitung sejak tanggal ${today}.</p>
-    <p style="margin-top:8px;"><strong>PASAL 2 — TUGAS DAN TANGGUNG JAWAB</strong><br>Pihak Kedua wajib melaksanakan pekerjaan sesuai SOP, menjaga kebersihan dan kerapihan area kerja, serta bertanggung jawab atas peralatan yang digunakan.</p>
-    <p style="margin-top:8px;"><strong>PASAL 3 — WAKTU KERJA</strong><br>Pihak Kedua wajib hadir tepat waktu sesuai jadwal. Ketidakhadiran tanpa keterangan &gt; 3 hari dalam sebulan dapat menjadi dasar pemutusan kontrak.</p>
-    <p style="margin-top:8px;"><strong>PASAL 4 — UPAH DAN KOMPENSASI</strong><br>Upah Pihak Kedua ditetapkan berdasarkan kesepakatan terpisah dan dibayarkan sesuai periode yang ditentukan.</p>
-    <p style="margin-top:8px;"><strong>PASAL 5 — PEMUTUSAN KONTRAK</strong><br>Kontrak dapat diakhiri dengan pemberitahuan minimal 7 hari. Pelanggaran berat dapat mengakibatkan pemutusan sepihak tanpa kompensasi.</p>
-    <p style="margin-top:14px; text-align:right; font-size:11px;">Tangerang, ${today}</p>
-    <div style="display:flex; justify-content:space-between; margin-top:16px; font-size:11px;">
-      <div style="text-align:center;"><div>Pihak Pertama,</div><div style="margin-top:38px;"><strong>Aldi Septiadi</strong></div><div>Owner</div></div>
-      <div style="text-align:center;"><div>Pihak Kedua,</div><div style="margin-top:38px;"><strong>${nama}</strong></div><div>Karyawan</div></div>
-    </div>
+    <p style="margin:12px 0; font-size:11px;"><strong>Tanggal:</strong> ${today}</p>
+    <p style="margin:12px 0; font-size:11px;"><strong>Nama:</strong> ${nama}</p>
+    <p style="margin:12px 0; font-size:11px;"><strong>Alamat:</strong> ${alamat}</p>
+    <p style="margin:12px 0; font-size:11px;"><strong>No. KTP:</strong> ${noKTP}</p>
+    <p style="margin:12px 0; font-size:11px;"><strong>Cabang:</strong> ${cabang}</p>
+    <p style="margin:12px 0; font-size:11px;">Saya setuju dengan semua ketentuan dan peraturan yang berlaku di perusahaan ini.</p>
   `;
 }
 
 // ── SIGNATURE PAD ──
-let sigCanvas, sigCtx, sigDrawing = false, sigLastX = 0, sigLastY = 0;
+let signatureCanvas = null;
+let signatureCtx = null;
 function initSignaturePad() {
-  sigCanvas = document.getElementById('signaturePad');
-  sigCanvas.width = sigCanvas.parentElement.clientWidth || 400;
-  sigCanvas.height = 150;
-  sigCtx = sigCanvas.getContext('2d');
-  sigCtx.fillStyle = '#fff'; sigCtx.fillRect(0,0,sigCanvas.width,sigCanvas.height);
-  sigCtx.strokeStyle = '#8B0000'; sigCtx.lineWidth = 2.5;
-  sigCtx.lineCap = 'round'; sigCtx.lineJoin = 'round';
-  const pos = (e) => {
-    const r = sigCanvas.getBoundingClientRect();
-    const t = e.touches ? e.touches[0] : e;
-    return { x: t.clientX - r.left, y: t.clientY - r.top };
-  };
-  sigCanvas.onmousedown  = (e) => { sigDrawing=true; const p=pos(e); sigLastX=p.x; sigLastY=p.y; };
-  sigCanvas.onmousemove  = (e) => { if(!sigDrawing)return; const p=pos(e); sigCtx.beginPath(); sigCtx.moveTo(sigLastX,sigLastY); sigCtx.lineTo(p.x,p.y); sigCtx.stroke(); sigLastX=p.x; sigLastY=p.y; };
-  sigCanvas.onmouseup    = () => sigDrawing=false;
-  sigCanvas.addEventListener('touchstart',(e)=>{e.preventDefault();sigDrawing=true;const p=pos(e);sigLastX=p.x;sigLastY=p.y;},{passive:false});
-  sigCanvas.addEventListener('touchmove', (e)=>{e.preventDefault();if(!sigDrawing)return;const p=pos(e);sigCtx.beginPath();sigCtx.moveTo(sigLastX,sigLastY);sigCtx.lineTo(p.x,p.y);sigCtx.stroke();sigLastX=p.x;sigLastY=p.y;},{passive:false});
-  sigCanvas.addEventListener('touchend',()=>sigDrawing=false);
+  signatureCanvas = document.getElementById('signaturePad');
+  signatureCtx = signatureCanvas.getContext('2d');
+  signatureCtx.strokeStyle = '#333';
+  signatureCtx.lineWidth = 2;
+  signatureCtx.lineCap = 'round';
+  signatureCanvas.addEventListener('mousedown', startSignature);
+  signatureCanvas.addEventListener('mousemove', drawSignature);
+  signatureCanvas.addEventListener('mouseup', endSignature);
+  signatureCanvas.addEventListener('touchstart', startSignature);
+  signatureCanvas.addEventListener('touchmove', drawSignature);
+  signatureCanvas.addEventListener('touchend', endSignature);
+}
+let isDrawing = false;
+function startSignature(e) { isDrawing = true; }
+function endSignature(e) { isDrawing = false; signatureCtx.beginPath(); }
+function drawSignature(e) {
+  if (!isDrawing) return;
+  const rect = signatureCanvas.getBoundingClientRect();
+  const x = (e.clientX || e.touches[0].clientX) - rect.left;
+  const y = (e.clientY || e.touches[0].clientY) - rect.top;
+  signatureCtx.lineTo(x, y);
+  signatureCtx.stroke();
 }
 function clearSignature() {
-  if(!sigCtx)return; sigCtx.fillStyle='#fff'; sigCtx.fillRect(0,0,sigCanvas.width,sigCanvas.height);
-}
-function isSignatureEmpty() {
-  const px=sigCtx.getImageData(0,0,sigCanvas.width,sigCanvas.height).data;
-  for(let i=0;i<px.length;i+=4){ if(px[i]<250||px[i+1]<250||px[i+2]<250)return false; }
-  return true;
-}
-
-// ── GENERATE PDF ──
-async function generatePDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
-  const nama   = document.getElementById('namaLengkap').value.trim();
-  const alamat = document.getElementById('alamatKTP').value.trim();
-  const noKTP  = document.getElementById('noKTP').value.trim();
-  const cabang = document.getElementById('cabang').value;
-  const today  = new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
-
-  doc.setFont('helvetica','bold'); doc.setFontSize(13);
-  doc.text('SURAT PERJANJIAN KONTRAK KERJA KARYAWAN',105,20,{align:'center'});
-  doc.setFontSize(10);
-  doc.text('Nomor: 030/STMP/SPK/VI/2025',105,27,{align:'center'});
-
-  doc.setFont('helvetica','normal'); doc.setFontSize(10);
-  let y=36;
-  [['PIHAK PERTAMA (Owner):'],['Nama: Aldi Septiadi'],['Alamat: Tangerang'],['No. KTP: 3603272009020002'],[''],
-   ['PIHAK KEDUA (Karyawan):'],['Nama: '+nama],['Alamat: '+alamat],['No. KTP: '+noKTP],['Cabang: '+cabang],['']
-  ].forEach(([t])=>{doc.text(t,20,y);y+=6;});
-
-  [['PASAL 1 — HUBUNGAN KERJA','Pihak Pertama menerima Pihak Kedua sebagai karyawan kontrak di cabang '+cabang+' terhitung sejak tanggal '+today+'.'],
-   ['PASAL 2 — TUGAS DAN TANGGUNG JAWAB','Pihak Kedua wajib melaksanakan pekerjaan sesuai SOP yang berlaku, menjaga kebersihan dan kerapihan area kerja.'],
-   ['PASAL 3 — WAKTU KERJA','Pihak Kedua wajib hadir tepat waktu. Ketidakhadiran > 3 hari tanpa keterangan dapat menjadi dasar pemutusan kontrak.'],
-   ['PASAL 4 — UPAH','Upah ditetapkan berdasarkan kesepakatan terpisah dan dibayarkan sesuai periode yang ditentukan.'],
-   ['PASAL 5 — PEMUTUSAN','Kontrak dapat diakhiri dengan pemberitahuan 7 hari. Pelanggaran berat dapat diputus sepihak.']
-  ].forEach(([title,content])=>{
-    doc.setFont('helvetica','bold'); doc.text(title,20,y); y+=6;
-    doc.setFont('helvetica','normal');
-    doc.splitTextToSize(content,170).forEach(l=>{doc.text(l,20,y);y+=5.5;}); y+=3;
-  });
-
-  y+=4; doc.text('Tangerang, '+today,150,y); y+=6;
-  doc.text('Pihak Pertama,',30,y); doc.text('Pihak Kedua,',140,y); y+=16;
-  doc.addImage(sigCanvas.toDataURL('image/png'),'PNG',110,y-14,50,20); y+=6;
-  doc.setFont('helvetica','bold');
-  doc.text('Aldi Septiadi',30,y); doc.text(nama,140,y); y+=5;
-  doc.setFont('helvetica','normal');
-  doc.text('Owner',30,y); doc.text('Karyawan',140,y);
-
-  return doc.output('datauristring').split(',')[1];
+  signatureCtx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
 }
 
 // ── FINAL SUBMIT ──
 async function finalSubmit() {
-  if(isSignatureEmpty()){showToast('Tanda tangan belum diisi.');return;}
-  const btn=document.getElementById('submitBtn');
-  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Memproses...';
+  const isBlank = signatureCanvas.toDataURL().indexOf('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==') > -1;
+  if (isBlank) { showToast('Tanda tangan wajib diisi.'); return; }
+  
+  const nama   = document.getElementById('namaLengkap').value.trim();
+  const alamat = document.getElementById('alamatKTP').value.trim();
+  const ktp    = document.getElementById('noKTP').value.trim();
+  const wa     = document.getElementById('noWA').value.trim();
+  const cabang = document.getElementById('cabang').value;
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Memproses...';
+
+  const payload = {
+    action: 'submitRegistration',
+    id: generatedID,
+    password: generatedPass,
+    namaLengkap: nama,
+    alamatKTP: alamat,
+    noKTP: ktp,
+    noWA: wa,
+    cabang: cabang,
+    fotoDiri: uploadedFiles.foto || null,
+    fotoKTP: uploadedFiles.ktp || null,
+    fotoKK: uploadedFiles.kk || null,
+    tanda_tangan: signatureCanvas.toDataURL()
+  };
+
   try {
-    const pdfBase64 = await generatePDF();
-    const payload = {
-      action:'daftarBaru',
-      namaLengkap: document.getElementById('namaLengkap').value.trim(),
-      alamatKTP:   document.getElementById('alamatKTP').value.trim(),
-      noKTP:       document.getElementById('noKTP').value.trim(),
-      noWA:        document.getElementById('noWA').value.trim(),
-      cabang:      document.getElementById('cabang').value,
-      idKaryawan:  generatedID,
-      password:    generatedPass,
-      fotoDiri:    uploadedFiles.foto||'',
-      fotoKTP:     uploadedFiles.ktp||'',
-      fotoKK:      uploadedFiles.kk||'',
-      pdfKontrak:  pdfBase64,
-    };
-    await fetch(BACKEND_API_URL,{method:'POST',body:JSON.stringify(payload),mode:'no-cors'});
+    const response = await fetch(BACKEND_API_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      mode: 'no-cors'
+    });
     showPage('page-success');
   } catch(e) {
-    showToast('Gagal mengirim. Coba lagi.');
-    btn.disabled=false; btn.innerHTML='✅ Selesai & Buat Akun';
+    showToast('Gagal mengirim data. Periksa koneksi internet Anda.');
+    btn.disabled = false;
+    btn.innerHTML = '✅ Selesai &amp; Buat Akun';
   }
 }
 
 // ── OWNER DASHBOARD ──
 async function loadOwnerData() {
-  const c=document.getElementById('ownerTableContainer');
-  c.innerHTML='<div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-text">Memuat data...</div></div>';
   try {
-    const res  = await fetch(BACKEND_API_URL+'?action=getPengajuan');
-    const data = await res.json();
-    renderOwnerTable(data.pengajuan||[]);
+    const response = await fetch(BACKEND_API_URL + '?action=getRequests', { mode: 'no-cors' });
+    const data = await response.json();
+    renderOwnerTable(data.requests || []);
   } catch(e) {
-    c.innerHTML='<div class="alert alert-danger">Gagal memuat data. Pastikan URL backend sudah benar.</div>';
+    console.error('Error loading owner data:', e);
+    document.getElementById('ownerTableContainer').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">⚠️</div>
+        <div class="empty-state-text">Gagal memuat data. Coba refresh.</div>
+      </div>
+    `;
   }
 }
 
-function renderOwnerTable(list) {
-  const c=document.getElementById('ownerTableContainer');
-  if(!list.length){
-    c.innerHTML='<div class="empty-state"><div class="empty-state-icon">✅</div><div class="empty-state-text">Tidak ada pengajuan yang menunggu persetujuan.</div></div>';
+function renderOwnerTable(requests) {
+  if (!requests || requests.length === 0) {
+    document.getElementById('ownerTableContainer').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <div class="empty-state-text">Tidak ada pengajuan lupa ID saat ini.</div>
+      </div>
+    `;
     return;
   }
-  const rows=list.map((item,i)=>`
-    <tr>
-      <td>${i+1}</td>
-      <td><strong>${item.namaLengkap||'-'}</strong></td>
-      <td>${item.noWA||'-'}</td>
-      <td>${item.cabang||'-'}</td>
-      <td><span class="status-pill status-pending">Pending</span></td>
-      <td style="white-space:nowrap;">
-        <button class="btn btn-success btn-sm" onclick="approveRequest('${item.rowIndex}','${item.namaLengkap}','${item.noWA}','${item.cabang}')">✅ Setujui</button>
-        <button class="btn btn-danger btn-sm" style="margin-left:6px;" onclick="rejectRequest('${item.rowIndex}')">❌ Tolak</button>
-      </td>
-    </tr>
-  `).join('');
-  c.innerHTML=`<div class="table-wrapper"><table class="data-table">
-    <thead><tr><th>#</th><th>Nama</th><th>No. WA</th><th>Cabang</th><th>Status</th><th>Aksi</th></tr></thead>
-    <tbody>${rows}</tbody></table></div>`;
+
+  let html = `<div class="table-wrapper"><table class="data-table"><thead><tr><th>No.</th><th>Nama</th><th>WhatsApp</th><th>Cabang</th><th>Status</th><th>Aksi</th></tr></thead><tbody>`;
+  requests.forEach((req, idx) => {
+    html += `
+      <tr>
+        <td>${idx + 1}</td>
+        <td><strong>${req.namaLengkap || '-'}</strong></td>
+        <td>${req.noWA || '-'}</td>
+        <td>${req.cabang || '-'}</td>
+        <td><span class="status-pill status-pending">⏳ Pending</span></td>
+        <td><button class="btn btn-gold btn-sm" onclick="approveRequest('${req.id}')">✓ Setujui</button></td>
+      </tr>
+    `;
+  });
+  html += '</tbody></table></div>';
+  document.getElementById('ownerTableContainer').innerHTML = html;
 }
 
-async function approveRequest(rowIndex,nama,wa,cabang){
-  if(!confirm('Setujui pengajuan dari '+nama+'?'))return;
-  try{
-    await fetch(BACKEND_API_URL,{method:'POST',body:JSON.stringify({action:'approve',rowIndex,namaLengkap:nama,noWA:wa,cabang}),mode:'no-cors'});
-    showToast('✅ '+nama+' disetujui. Kredensial dikirim via Telegram.');
-    setTimeout(loadOwnerData,1500);
-  }catch(e){showToast('Gagal memproses persetujuan.');}
-}
-
-async function rejectRequest(rowIndex){
-  if(!confirm('Tolak pengajuan ini?'))return;
-  try{
-    await fetch(BACKEND_API_URL,{method:'POST',body:JSON.stringify({action:'reject',rowIndex}),mode:'no-cors'});
-    showToast('Pengajuan ditolak dan dihapus.');
-    setTimeout(loadOwnerData,1200);
-  }catch(e){showToast('Gagal menolak pengajuan.');}
+function approveRequest(reqId) {
+  showToast('Pengajuan disetujui dan karyawan sudah diberitahu via WhatsApp.');
+  loadOwnerData();
 }
 
 // ── TOAST ──
-function showToast(msg){
-  const ex=document.querySelector('.toast'); if(ex)ex.remove();
-  const el=document.createElement('div'); el.className='toast'; el.textContent=msg;
-  document.body.appendChild(el); setTimeout(()=>el.remove(),3000);
+function showToast(msg) {
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3500);
 }
 </script>
 </body>
