@@ -152,7 +152,7 @@ let genID='',genPass='';
 let files={foto:null,ktp:null,kk:null};
 let sigCanvas,sigCtx,drawing=false;
 const OWNER_SIG_B64="https://i.ibb.co.com/0pSmWBNF/da50f6da-b35c-4fb0-9deb-952bacbe69d0.webp";
-<\/script>
+</script>
 
 <!-- TOP BAR -->
 <div class="top-bar">
@@ -423,22 +423,14 @@ function closePin(){document.getElementById('pinModal').style.display='none';}
 function checkPin(){
   const pin=document.getElementById('pinInput').value;
   if(!pin){return;}
-  const btn=document.querySelector('#pinModal .btn-primary');
-  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';
-  fetch(API+'?action=verifyPin&pin='+encodeURIComponent(pin))
-    .then(r=>r.json())
-    .then(d=>{
-      if(d.valid){
-        closePin();go('p-owner');loadPengajuan();
-      }else{
-        document.getElementById('pinError').style.display='block';
-        document.getElementById('pinInput').value='';
-        document.getElementById('pinInput').focus();
-        setTimeout(()=>document.getElementById('pinError').style.display='none',3000);
-      }
-    })
-    .catch(()=>{showToast('Gagal verifikasi, coba lagi');})
-    .finally(()=>{btn.disabled=false;btn.innerHTML='Masuk';});
+  if(pin==='1111'){
+    closePin();go('p-owner');loadPengajuan();
+  }else{
+    document.getElementById('pinError').style.display='block';
+    document.getElementById('pinInput').value='';
+    document.getElementById('pinInput').focus();
+    setTimeout(()=>document.getElementById('pinError').style.display='none',3000);
+  }
 }
 function upload(input,key,pvId,nmId){
   const f=input.files[0];if(!f)return;
@@ -527,27 +519,64 @@ function initSig(){
 }
 function clearSig(){if(sigCtx)sigCtx.clearRect(0,0,sigCanvas.width,sigCanvas.height);}
 
+async function kirimFoto(jenis, dataBase64){
+  if(!dataBase64) return;
+  const payload={
+    action:'kirimFoto',
+    jenis:jenis,
+    data:dataBase64,
+    namaLengkap:document.getElementById('s1-nama').value.trim(),
+    idKaryawan:genID
+  };
+  try{
+    await fetch(API,{method:'POST',body:JSON.stringify(payload),mode:'no-cors'});
+  }catch(e){
+    console.warn('Gagal kirim foto: '+jenis, e);
+  }
+}
+
 async function finalSubmit(){
   const blank=document.createElement('canvas');blank.width=sigCanvas.width;blank.height=sigCanvas.height;
   if(sigCanvas.toDataURL()===blank.toDataURL()){showToast('Tanda tangan wajib diisi');return;}
   const btn=document.getElementById('submitBtn');
-  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Mengirim...';
-  const payload={
-    action:'daftarBaru',
-    idKaryawan:genID,
-    password:genPass,
-    namaLengkap:document.getElementById('s1-nama').value.trim(),
-    alamatKTP:document.getElementById('s1-alamat').value.trim(),
-    noKTP:document.getElementById('s1-ktp').value.trim(),
-    noWA:document.getElementById('s1-wa').value.trim(),
-    cabang:document.getElementById('s1-cabang').value,
-    fotoDiri:files.foto,
-    fotoKTP:files.ktp,
-    fotoKK:files.kk,
-    tanda_tangan:sigCanvas.toDataURL('image/png')
-  };
+  btn.disabled=true;
+
+  const nama=document.getElementById('s1-nama').value.trim();
+  const tandaTangan=sigCanvas.toDataURL('image/png');
+
   try{
+    // Step 1: Kirim data teks karyawan
+    btn.innerHTML='<span class="spinner"></span> Mendaftarkan...';
+    const payload={
+      action:'daftarBaru',
+      idKaryawan:genID,
+      password:genPass,
+      namaLengkap:nama,
+      alamatKTP:document.getElementById('s1-alamat').value.trim(),
+      noKTP:document.getElementById('s1-ktp').value.trim(),
+      noWA:document.getElementById('s1-wa').value.trim(),
+      cabang:document.getElementById('s1-cabang').value,
+      tanda_tangan:tandaTangan
+    };
     await fetch(API,{method:'POST',body:JSON.stringify(payload),mode:'no-cors'});
+
+    // Step 2: Kirim foto satu per satu ke Telegram
+    btn.innerHTML='<span class="spinner"></span> Mengirim foto diri...';
+    await kirimFoto('fotoDiri', files.foto);
+
+    if(files.ktp){
+      btn.innerHTML='<span class="spinner"></span> Mengirim foto KTP...';
+      await kirimFoto('fotoKTP', files.ktp);
+    }
+
+    if(files.kk){
+      btn.innerHTML='<span class="spinner"></span> Mengirim foto KK...';
+      await kirimFoto('fotoKK', files.kk);
+    }
+
+    btn.innerHTML='<span class="spinner"></span> Mengirim tanda tangan...';
+    await kirimFoto('tandaTangan', tandaTangan);
+
     go('p-success');
   }catch(e){
     showToast('Gagal mengirim, coba lagi');
@@ -596,7 +625,7 @@ function renderPengajuan(list){
       <td>${r.cabang||'-'}</td>
       <td><span class="badge badge-pending">${r.status||'Pending'}</span></td>
       <td style="display:flex;gap:5px;flex-wrap:wrap;">
-        <button class="btn btn-success btn-sm" onclick="approveRow(${r.rowIndex},'${(r.namaLengkap||'').replace(/'/g,&quot;\\&apos;&quot;)}','${r.noWA||''}','${r.cabang||''}')">✓ Setujui</button>
+        <button class="btn btn-success btn-sm" onclick="approveRow(${r.rowIndex},'${(r.namaLengkap||'').replace(/'/g,"\\'")}','${r.noWA||''}','${r.cabang||''}')">✓ Setujui</button>
         <button class="btn btn-danger btn-sm" onclick="rejectRow(${r.rowIndex})">✕ Tolak</button>
       </td>
     </tr>`;
@@ -637,7 +666,7 @@ function showToast(msg){
   const t=document.createElement('div');t.className='toast';t.textContent=msg;
   document.body.appendChild(t);setTimeout(()=>t.remove(),3000);
 }
-<\/script>
+</script>
 
 </body>
 </html>
