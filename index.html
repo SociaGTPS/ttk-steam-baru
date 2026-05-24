@@ -480,25 +480,64 @@ function showStep3(){
   const noKTP=document.getElementById('s1-ktp').value.trim();
   const cabang=document.getElementById('s1-cabang').value;
   const today=new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+
+  // Nomor surat & pasal upah beda per cabang
+  const nomorSurat='030/STMP/SPK/VI/2025';
+  const isGrobogan = cabang==='Cabang Grobogan';
+  const targetBonus = isGrobogan ? '100' : '50';
+  const pasal3Label = isGrobogan ? 'Cabang Grobogan' : 'Cabang Palis / Cayur';
+
   document.getElementById('contractText').innerHTML=`
-    <h4>KONTRAK KERJA KARYAWAN</h4>
-    <p><strong>Tanggal:</strong> ${today}</p>
-    <p><strong>Nama:</strong> ${nama}</p>
-    <p><strong>Alamat:</strong> ${alamat}</p>
-    <p><strong>No. KTP:</strong> ${noKTP}</p>
-    <p><strong>Cabang:</strong> ${cabang}</p>
-    <p><strong>ID Karyawan:</strong> ${genID}</p>
-    <p style="margin-top:10px;">Dengan ini saya menyatakan bersedia bekerja sesuai ketentuan dan peraturan yang berlaku di Steam MP 7000.</p>
+    <h4>SURAT PERJANJIAN KONTRAK KERJA KARYAWAN</h4>
+    <p style="text-align:center;font-size:11px;margin-bottom:8px;">Nomor: ${nomorSurat}<br>Tanggal: ${today}</p>
+
+    <p><strong>Pihak Pertama (Owner / Pemberi Kerja):</strong></p>
+    <p>Nama: Aldi Septiadi<br>Alamat: Tangerang<br>No. KTP: 3603272009020002</p>
+
+    <p style="margin-top:8px;"><strong>Pihak Kedua (Karyawan):</strong></p>
+    <p>Nama: ${nama}<br>Alamat: ${alamat}<br>No. KTP: ${noKTP}<br>Cabang: ${cabang}<br>ID Karyawan: ${genID}</p>
+
+    <p style="margin-top:10px;"><strong>Pasal 1 – Masa Kontrak Kerja</strong></p>
+    <p>Pihak Kedua bekerja kepada Pihak Pertama sebagai karyawan selama 3 (tiga) bulan terhitung sejak tanggal penandatanganan kontrak ini.</p>
+
+    <p style="margin-top:8px;"><strong>Pasal 2 – Tugas dan Tanggung Jawab</strong></p>
+    <p>1. Melaksanakan pekerjaan mencuci motor dengan cepat, bersih, dan rapi sesuai arahan Kepala Toko.<br>
+    2. Mematuhi jam kerja yang telah ditentukan, yaitu pukul 07:00 hingga 22:00.<br>
+    3. Melaporkan jumlah unit motor yang dicuci setiap hari kepada Kepala Toko.<br>
+    4. Menjaga kebersihan area kerja dan memperlakukan peralatan dengan baik.<br>
+    5. Tunduk pada wewenang dan arahan Kepala Toko sebagai atasan langsung.</p>
+
+    <p style="margin-top:8px;"><strong>Pasal 3 – Sistem Upah dan Bonus (${pasal3Label})</strong></p>
+    <p>Upah per unit motor Rp 7.000, dibagi:<br>
+    • Karyawan: Rp 3.000<br>
+    • Owner: Rp 4.000<br>
+    Kasbon harian maksimal Rp 20.000.<br>
+    Bonus target harian: jika tercapai ${targetBonus} motor tercuci, mendapat tambahan Rp 5.000.<br>
+    Seluruh tips wajib dicatat dan akan diberikan setelah turun gaji.<br>
+    Pembagian hasil dilakukan per 2 minggu sekali.</p>
+
+    <p style="margin-top:8px;"><strong>Pasal 4 – Pengunduran Diri Sebelum Kontrak Berakhir</strong></p>
+    <p>1. Jika mengundurkan diri secara baik-baik, dikenakan potongan sebesar 20% dari total gaji.<br>
+    2. Jika mengundurkan diri tanpa pemberitahuan atau melarikan diri, dikenakan potongan maksimal 50% dari total gaji.<br>
+    3. Apabila tetap meminta pembayaran gaji setelah melarikan diri atau berhenti sepihak, maka pembayaran (jika disetujui) hanya dapat dilakukan langsung di tempat kerja.<br>
+    4. Seluruh pembayaran gaji yang menjadi hak Pihak Kedua wajib diberikan maksimal 7 hari setelah masa kontrak berakhir.</p>
+
+    <p style="margin-top:8px;"><strong>Pasal 5 – Penyelesaian Perselisihan</strong></p>
+    <p>Perselisihan diselesaikan terlebih dahulu secara musyawarah. Jika tidak tercapai kesepakatan, maka akan diselesaikan sesuai hukum yang berlaku di wilayah Tangerang.</p>
+
+    <p style="margin-top:8px;font-size:11px;">Perjanjian ini dibuat dalam dua rangkap dan ditandatangani secara sadar oleh kedua belah pihak.</p>
+    <p style="font-size:11px;">Tangerang, ${today}</p>
+
     <div class="sig-row">
       <div class="sig-block">
-        <div class="sig-label">Tanda Tangan Karyawan</div>
-        <div style="height:50px;border-bottom:1px solid rgba(255,255,255,.2);margin-bottom:4px;"></div>
-        <div class="sig-name">${nama}</div>
+        <div class="sig-label">Pihak Pertama (Owner)</div>
+        <img src="${OWNER_SIG_B64}" class="sig-img" alt="Tanda Tangan Owner">
+        <div class="sig-name">( Aldi Septiadi )</div>
       </div>
       <div class="sig-block">
-        <div class="sig-label">Mengetahui, Pemilik</div>
-        <img src="${OWNER_SIG_B64}" class="sig-img" alt="Tanda Tangan Owner">
-        <div class="sig-name">Aldi Septiadi</div>
+        <div class="sig-label">Pihak Kedua (Karyawan)</div>
+        <div style="height:50px;border-bottom:1px solid rgba(255,255,255,.2);margin-bottom:4px;"></div>
+        <div class="sig-name">( ${nama} )</div>
       </div>
     </div>`;
   go('p-step3');
