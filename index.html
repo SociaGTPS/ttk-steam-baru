@@ -140,7 +140,7 @@ footer strong{color:rgba(255,255,255,.7);}
 <body>
 
 <script>
-const API="https://script.google.com/macros/s/AKfycbyAYtVRBLX5-eksqNFF1F9A6-88XW229TFaZFToznlNRIRweaARu2zdbjGPqfWMRlIW/exec";
+const API="https://script.google.com/macros/s/AKfycbwOPeavkO_GA9pHzN86maKWSlXwuStOy_80o4ixZWRsfqk8MFVR-3WANARmuTxKn00Y/exec";
 let genID='',genPass='';
 let files={foto:null,ktp:null,kk:null};
 let sigCanvas,sigCtx,drawing=false;
@@ -704,35 +704,22 @@ function mirrorTTD(){
 }
 
 /* ══════════════════════════════════════════════════════
-   KIRIM FOTO — mengirim jabatan & cabang agar caption
-   Telegram menampilkan info lengkap per jenis gambar
+   KIRIM SATU ITEM VIA FORM-DATA (bypass CORS GAS)
+   GAS hanya membaca JSON dari text/plain body ketika
+   tidak ada preflight — gunakan no-cors agar tidak
+   block, tapi kirim sebagai form-data multipart
+   SOLUSI: kirim semua sekaligus dalam 1 payload besar
+   di finalSubmit agar GAS proses semuanya sekaligus.
 ══════════════════════════════════════════════════════ */
-async function kirimFoto(jenis, dataBase64){
-  if(!dataBase64)return;
-  const payload={
-    action      :'kirimFoto',
-    jenis,
-    data        :dataBase64,
-    namaLengkap :document.getElementById('s1-nama').value.trim(),
-    idKaryawan  :genID,
-    jabatan     :document.getElementById('s1-jabatan').value,   // ← penting
-    cabang      :document.getElementById('s1-cabang').value     // ← penting
-  };
-  try{
-    await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload),mode:'no-cors'});
-  }catch(e){
-    console.warn('Gagal kirim foto: '+jenis,e);
-  }
-}
 
 /* ══════════════════════════════════════════════════════
-   FINAL SUBMIT
-   Urutan pengiriman ke Telegram:
-   1️⃣  Teks notifikasi (daftarBaru)  — jabatan benar
+   FINAL SUBMIT — kirim SEMUA dalam 1 request ke GAS
+   GAS memproses & kirim ke Telegram:
+   1️⃣  Teks notifikasi (nama, jabatan, id, pass, dll)
    2️⃣  Foto Diri
    3️⃣  Foto KTP     (jika ada)
    4️⃣  Foto KK      (jika ada)
-   5️⃣  Tanda Tangan Kontrak  ← sebagai dokumen via GAS
+   5️⃣  Tanda Tangan Kontrak (sebagai dokumen)
 ══════════════════════════════════════════════════════ */
 async function finalSubmit(){
   const blank=document.createElement('canvas');
@@ -741,53 +728,46 @@ async function finalSubmit(){
 
   const btn=document.getElementById('submitBtn');
   btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span> Mengirim data...';
 
-  const nama       =document.getElementById('s1-nama').value.trim();
-  const jabatan    =document.getElementById('s1-jabatan').value;
-  const cabang     =document.getElementById('s1-cabang').value;
-  const tandaTangan=sigCanvas.toDataURL('image/png');
+  const nama        =document.getElementById('s1-nama').value.trim();
+  const jabatan     =document.getElementById('s1-jabatan').value;
+  const cabang      =document.getElementById('s1-cabang').value;
+  const tandaTangan =sigCanvas.toDataURL('image/png');
 
-  // ── 1. Data teks utama ───────────────────────────────
-  btn.innerHTML='<span class="spinner"></span> Mendaftarkan...';
+  // Kirim SEMUA sekaligus dalam 1 payload — GAS proses semua di server
+  const payload={
+    action       :'daftarBaru',
+    idKaryawan   :genID,
+    password     :genPass,
+    namaLengkap  :nama,
+    alamatKTP    :document.getElementById('s1-alamat').value.trim(),
+    noKTP        :document.getElementById('s1-ktp').value.trim(),
+    noWA         :document.getElementById('s1-wa').value.trim(),
+    cabang,
+    jabatan,
+    tanda_tangan :true,
+    // Sertakan semua file langsung agar GAS kirim ke Telegram sekaligus
+    fotoDiri     :files.foto     || null,
+    fotoKTP      :files.ktp      || null,
+    fotoKK       :files.kk       || null,
+    tandaTanganB64:tandaTangan
+  };
+
   try{
-    const payload={
-      action      :'daftarBaru',
-      idKaryawan  :genID,
-      password    :genPass,
-      namaLengkap :nama,
-      alamatKTP   :document.getElementById('s1-alamat').value.trim(),
-      noKTP       :document.getElementById('s1-ktp').value.trim(),
-      noWA        :document.getElementById('s1-wa').value.trim(),
-      cabang,
-      jabatan,                     // ← jabatan yang benar (Karyawan/Kepala Toko)
-      tanda_tangan:!!tandaTangan
-    };
-    await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload),mode:'no-cors'});
-  }catch(e){console.warn('Gagal kirim data utama',e);}
-
-  // ── 2. Foto Diri ─────────────────────────────────────
-  btn.innerHTML='<span class="spinner"></span> Mengirim foto diri...';
-  await kirimFoto('fotoDiri',files.foto);
-  await new Promise(r=>setTimeout(r,900));
-
-  // ── 3. Foto KTP ──────────────────────────────────────
-  if(files.ktp){
-    btn.innerHTML='<span class="spinner"></span> Mengirim foto KTP...';
-    await kirimFoto('fotoKTP',files.ktp);
-    await new Promise(r=>setTimeout(r,900));
+    await fetch(API,{
+      method :'POST',
+      headers:{'Content-Type':'text/plain'},
+      body   :JSON.stringify(payload),
+      mode   :'no-cors'   // no-cors agar tidak trigger preflight; GAS tetap terima body
+    });
+    btn.innerHTML='<span class="spinner"></span> Terkirim!';
+  }catch(e){
+    console.warn('fetch error (expected dengan no-cors):',e);
   }
 
-  // ── 4. Foto KK ───────────────────────────────────────
-  if(files.kk){
-    btn.innerHTML='<span class="spinner"></span> Mengirim foto KK...';
-    await kirimFoto('fotoKK',files.kk);
-    await new Promise(r=>setTimeout(r,900));
-  }
-
-  // ── 5. Tanda Tangan Kontrak (sebagai dokumen) ────────
-  btn.innerHTML='<span class="spinner"></span> Mengirim tanda tangan kontrak...';
-  await kirimFoto('tandaTangan',tandaTangan);   // GAS akan kirim sbg sendDocument
-
+  // Tunggu sebentar agar GAS selesai proses sebelum redirect
+  await new Promise(r=>setTimeout(r,2500));
   go('p-success');
 }
 
