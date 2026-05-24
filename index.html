@@ -568,7 +568,9 @@ async function kirimFoto(jenis, dataBase64){
     idKaryawan:genID
   };
   try{
-    await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)});
+    // no-cors: request tetap sampai ke GAS meski response tidak bisa dibaca
+    await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload),mode:'no-cors'});
+    console.log('kirimFoto '+jenis+' terkirim');
   }catch(e){
     console.warn('Gagal kirim foto: '+jenis, e);
   }
@@ -597,7 +599,8 @@ async function finalSubmit(){
       cabang:document.getElementById('s1-cabang').value,
       tanda_tangan:tandaTangan
     };
-    await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)});
+    await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload),mode:'no-cors'});
+    console.log('daftarBaru terkirim');
 
     // Step 2: Kirim foto satu per satu ke Telegram
     btn.innerHTML='<span class="spinner"></span> Mengirim foto diri...';
@@ -632,7 +635,7 @@ async function submitLupaID(){
   btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Mengirim...';
   const payload={action:'lupaID',namaLengkap:nama,noWA:wa,cabang:cab};
   try{
-    await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)});
+    await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload),mode:'no-cors'});
     go('p-success-lupa');
   }catch(e){
     showToast('Gagal mengirim, coba lagi');
@@ -678,7 +681,7 @@ async function approveRow(rowIndex,nama,wa,cabang){
   showToast('Memproses persetujuan...');
   const payload={action:'approve',rowIndex,namaLengkap:nama,noWA:wa,cabang};
   try{
-    const res=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)});
+    const res=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload),mode:'no-cors'});
     showToast('✅ Disetujui! Kredensial baru terkirim via Telegram.');
     setTimeout(loadPengajuan,1500);
   }catch(e){showToast('Gagal approve, coba lagi');}
@@ -688,7 +691,7 @@ async function rejectRow(rowIndex){
   if(!confirm('Tolak dan hapus pengajuan ini?'))return;
   const payload={action:'reject',rowIndex};
   try{
-    await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)});
+    await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload),mode:'no-cors'});
     showToast('Pengajuan ditolak dan dihapus.');
     setTimeout(loadPengajuan,1500);
   }catch(e){showToast('Gagal reject, coba lagi');}
