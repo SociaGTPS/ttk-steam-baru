@@ -568,7 +568,7 @@ async function kirimFoto(jenis, dataBase64){
     idKaryawan:genID
   };
   try{
-    await fetch(API,{method:'POST',body:JSON.stringify(payload),mode:'no-cors'});
+    await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)});
   }catch(e){
     console.warn('Gagal kirim foto: '+jenis, e);
   }
@@ -597,7 +597,7 @@ async function finalSubmit(){
       cabang:document.getElementById('s1-cabang').value,
       tanda_tangan:tandaTangan
     };
-    await fetch(API,{method:'POST',body:JSON.stringify(payload),mode:'no-cors'});
+    await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)});
 
     // Step 2: Kirim foto satu per satu ke Telegram
     btn.innerHTML='<span class="spinner"></span> Mengirim foto diri...';
@@ -632,7 +632,7 @@ async function submitLupaID(){
   btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Mengirim...';
   const payload={action:'lupaID',namaLengkap:nama,noWA:wa,cabang:cab};
   try{
-    await fetch(API,{method:'POST',body:JSON.stringify(payload),mode:'no-cors'});
+    await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)});
     go('p-success-lupa');
   }catch(e){
     showToast('Gagal mengirim, coba lagi');
@@ -678,7 +678,7 @@ async function approveRow(rowIndex,nama,wa,cabang){
   showToast('Memproses persetujuan...');
   const payload={action:'approve',rowIndex,namaLengkap:nama,noWA:wa,cabang};
   try{
-    const res=await fetch(API,{method:'POST',body:JSON.stringify(payload),mode:'no-cors'});
+    const res=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)});
     showToast('✅ Disetujui! Kredensial baru terkirim via Telegram.');
     setTimeout(loadPengajuan,1500);
   }catch(e){showToast('Gagal approve, coba lagi');}
@@ -688,7 +688,7 @@ async function rejectRow(rowIndex){
   if(!confirm('Tolak dan hapus pengajuan ini?'))return;
   const payload={action:'reject',rowIndex};
   try{
-    await fetch(API,{method:'POST',body:JSON.stringify(payload),mode:'no-cors'});
+    await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)});
     showToast('Pengajuan ditolak dan dihapus.');
     setTimeout(loadPengajuan,1500);
   }catch(e){showToast('Gagal reject, coba lagi');}
