@@ -558,20 +558,34 @@ function initSig(){
 }
 function clearSig(){if(sigCtx)sigCtx.clearRect(0,0,sigCanvas.width,sigCanvas.height);}
 
-async function kirimFoto(jenis, dataBase64){
-  if(!dataBase64) return;
+async function kirimFoto(jenis, dataBase64, maxRetry=2){
+  if(!dataBase64) return {ok:true, skipped:true};
+  const nama = document.getElementById('s1-nama').value.trim();
   const payload={
     action:'kirimFoto',
     jenis:jenis,
     data:dataBase64,
-    namaLengkap:document.getElementById('s1-nama').value.trim(),
+    namaLengkap:nama,
     idKaryawan:genID
   };
-  try{
-    await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)});
-  }catch(e){
-    console.warn('Gagal kirim foto: '+jenis, e);
+  const body = JSON.stringify(payload);
+  for(let attempt=1; attempt<=maxRetry; attempt++){
+    try{
+      const res = await fetch(API,{
+        method:'POST',
+        headers:{'Content-Type':'text/plain'},
+        body:body
+      });
+      // GAS selalu 200, tapi kita cek response text
+      const txt = await res.text();
+      console.log('kirimFoto '+jenis+' attempt '+attempt+': '+txt);
+      return {ok:true};
+    }catch(e){
+      console.warn('kirimFoto '+jenis+' attempt '+attempt+' gagal:', e);
+      if(attempt < maxRetry) await new Promise(r=>setTimeout(r,1500));
+    }
   }
+  return {ok:false, jenis:jenis};
 }
 
 async function finalSubmit(){
@@ -581,7 +595,14 @@ async function finalSubmit(){
   btn.disabled=true;
 
   const nama=document.getElementById('s1-nama').value.trim();
-  const tandaTangan=sigCanvas.toDataURL('image/png');
+
+  // Kompres tanda tangan ke JPEG (lebih kecil dari PNG)
+  const tempCv=document.createElement('canvas');
+  tempCv.width=sigCanvas.width;tempCv.height=sigCanvas.height;
+  const tCtx=tempCv.getContext('2d');
+  tCtx.fillStyle='#ffffff';tCtx.fillRect(0,0,tempCv.width,tempCv.height);
+  tCtx.drawImage(sigCanvas,0,0);
+  const tandaTangan=tempCv.toDataURL('image/jpeg',0.7);
 
   try{
     // Step 1: Kirim data teks karyawan
@@ -595,29 +616,48 @@ async function finalSubmit(){
       noKTP:document.getElementById('s1-ktp').value.trim(),
       noWA:document.getElementById('s1-wa').value.trim(),
       cabang:document.getElementById('s1-cabang').value,
-      tanda_tangan:tandaTangan
+      tanda_tangan:!!tandaTangan
     };
-    await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)});
 
-    // Step 2: Kirim foto satu per satu ke Telegram
-    btn.innerHTML='<span class="spinner"></span> Mengirim foto diri...';
-    await kirimFoto('fotoDiri', files.foto);
-
-    if(files.ktp){
-      btn.innerHTML='<span class="spinner"></span> Mengirim foto KTP...';
-      await kirimFoto('fotoKTP', files.ktp);
+    let resDaftar;
+    try{
+      resDaftar = await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)});
+    }catch(netErr){
+      showToast('⚠️ Gagal koneksi ke server. Cek internet & coba lagi.');
+      btn.disabled=false;btn.innerHTML='Selesai & Kirim ✅';
+      return;
+    }
+    const txtDaftar = await resDaftar.text();
+    console.log('daftarBaru response:', txtDaftar);
+    let jsonDaftar={};
+    try{ jsonDaftar=JSON.parse(txtDaftar); }catch(_){}
+    if(jsonDaftar.status==='error'){
+      showToast('⚠️ Gagal daftar: '+(jsonDaftar.message||'Error server'));
+      btn.disabled=false;btn.innerHTML='Selesai & Kirim ✅';
+      return;
     }
 
-    if(files.kk){
-      btn.innerHTML='<span class="spinner"></span> Mengirim foto KK...';
-      await kirimFoto('fotoKK', files.kk);
-    }
+    // Step 2: Kirim semua foto secara PARALEL ke Telegram
+    btn.innerHTML='<span class="spinner"></span> Mengirim foto ke Telegram...';
 
-    btn.innerHTML='<span class="spinner"></span> Mengirim tanda tangan...';
-    await kirimFoto('tandaTangan', tandaTangan);
+    const fotoJobs=[
+      kirimFoto('fotoDiri', files.foto),
+      files.ktp ? kirimFoto('fotoKTP', files.ktp) : Promise.resolve({ok:true,skipped:true}),
+      files.kk  ? kirimFoto('fotoKK',  files.kk)  : Promise.resolve({ok:true,skipped:true}),
+      kirimFoto('tandaTangan', tandaTangan)
+    ];
+
+    const results = await Promise.all(fotoJobs);
+    const gagal = results.filter(r=>!r.ok && !r.skipped);
+    if(gagal.length>0){
+      const jenisGagal = gagal.map(r=>r.jenis).join(', ');
+      showToast('⚠️ Data tersimpan, tapi foto gagal terkirim: '+jenisGagal);
+      console.warn('Foto yang gagal terkirim:', gagal);
+    }
 
     go('p-success');
   }catch(e){
+    console.error('finalSubmit error:', e);
     showToast('Gagal mengirim, coba lagi');
     btn.disabled=false;btn.innerHTML='Selesai & Kirim ✅';
   }
