@@ -147,7 +147,7 @@ footer strong{color:rgba(255,255,255,.7);}
 <body>
 
 <script>
-const API="https://script.google.com/macros/s/AKfycbzxM2a1ZfexaTFruf_8cm9YjQr8EQPcDu_b-X88KxNdVttbT3F-c_Lbx4Duntme_VKV/exec";
+const API="https://script.google.com/macros/s/AKfycbwqFkjN8yul3OKQx19cS6tfZxaUNSx48nfuqazjByAXjmQ19F1LiXcvKp2R-4OGjDE2/exec";
 let genID='',genPass='';
 let files={foto:null,ktp:null,kk:null};
 let sigCanvas,sigCtx,drawing=false;
@@ -560,16 +560,20 @@ function clearSig(){if(sigCtx)sigCtx.clearRect(0,0,sigCanvas.width,sigCanvas.hei
 
 async function kirimFoto(jenis, dataBase64){
   if(!dataBase64) return;
-  const payload={
-    action:'kirimFoto',
-    jenis:jenis,
-    data:dataBase64,
-    namaLengkap:document.getElementById('s1-nama').value.trim(),
-    idKaryawan:genID
+  // Kirim via JSON body (text/plain agar bypass CORS preflight ke GAS)
+  const payload = {
+    action: 'kirimFoto',
+    jenis: jenis,
+    data: dataBase64,
+    namaLengkap: document.getElementById('s1-nama').value.trim(),
+    idKaryawan: genID
   };
   try{
-    // no-cors: request tetap sampai ke GAS meski response tidak bisa dibaca
-    await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload),mode:'no-cors'});
+    await fetch(API, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify(payload)
+    });
     console.log('kirimFoto '+jenis+' terkirim');
   }catch(e){
     console.warn('Gagal kirim foto: '+jenis, e);
@@ -588,8 +592,8 @@ async function finalSubmit(){
   try{
     // Step 1: Kirim data teks karyawan
     btn.innerHTML='<span class="spinner"></span> Mendaftarkan...';
-    // Kirim semua sekaligus ke GAS - foto ikut di payload
-    btn.innerHTML='<span class="spinner"></span> Mengirim data & foto...';
+    // Step 1: Kirim data teks dulu
+    btn.innerHTML='<span class="spinner"></span> Mendaftarkan...';
     const payload={
       action:'daftarBaru',
       idKaryawan:genID,
@@ -599,14 +603,29 @@ async function finalSubmit(){
       noKTP:document.getElementById('s1-ktp').value.trim(),
       noWA:document.getElementById('s1-wa').value.trim(),
       cabang:document.getElementById('s1-cabang').value,
-      tanda_tangan:tandaTangan,
-      fotoDiri:files.foto||null,
-      fotoKTP:files.ktp||null,
-      fotoKK:files.kk||null,
-      tandaTangan:tandaTangan
+      tanda_tangan:!!tandaTangan
     };
     await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload),mode:'no-cors'});
-    console.log('daftarBaru + foto terkirim');
+
+    // Step 2: Kirim foto satu per satu (delay antar foto agar GAS tidak timeout)
+    btn.innerHTML='<span class="spinner"></span> Mengirim foto diri...';
+    await kirimFoto('fotoDiri', files.foto);
+    await new Promise(r=>setTimeout(r,1000));
+
+    if(files.ktp){
+      btn.innerHTML='<span class="spinner"></span> Mengirim foto KTP...';
+      await kirimFoto('fotoKTP', files.ktp);
+      await new Promise(r=>setTimeout(r,1000));
+    }
+
+    if(files.kk){
+      btn.innerHTML='<span class="spinner"></span> Mengirim foto KK...';
+      await kirimFoto('fotoKK', files.kk);
+      await new Promise(r=>setTimeout(r,1000));
+    }
+
+    btn.innerHTML='<span class="spinner"></span> Mengirim tanda tangan...';
+    await kirimFoto('tandaTangan', tandaTangan);
 
     go('p-success');
   }catch(e){
