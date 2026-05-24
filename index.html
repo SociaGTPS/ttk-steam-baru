@@ -4,11 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#1a0a0e">
-  <title>Steam MP 7000 — Sistem Karyawan</title>
-</head>
-<body>
-
-<style>
+  <title>Steam MP 7000 — Sistem Manajemen Karyawan</title>
+  <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
   --dark:#1a0a0e;--dark-2:#2d1219;--dark-3:#3f1a24;--dark-4:#56232f;
@@ -91,8 +88,14 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--dark);color:va
 .cred-div{height:1px;background:var(--b1);margin:0 0 14px;}
 .cred-note{background:var(--red-dim);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--red-soft);text-align:left;}
 
-.contract-preview{background:var(--dark);border:1px solid var(--b1);border-radius:8px;padding:14px;font-size:12px;color:rgba(255,255,255,.8);line-height:1.8;max-height:320px;overflow-y:auto;margin-bottom:14px;}
+.contract-preview{background:var(--dark);border:1px solid var(--b1);border-radius:8px;padding:14px;font-size:12px;color:rgba(255,255,255,.8);line-height:1.8;max-height:220px;overflow-y:auto;margin-bottom:14px;}
 .contract-preview h4{text-align:center;font-size:13px;color:var(--red-soft);margin-bottom:10px;}
+.contract-preview .sig-row{display:flex;justify-content:space-between;align-items:flex-end;margin-top:18px;gap:16px;}
+.contract-preview .sig-block{text-align:center;flex:1;}
+.contract-preview .sig-block .sig-label{font-size:10px;color:rgba(255,255,255,.5);margin-bottom:6px;}
+.contract-preview .sig-block .sig-img{max-height:50px;max-width:100%;filter:invert(1);opacity:0.85;margin-bottom:2px;}
+.contract-preview .sig-block .sig-name{font-size:10px;border-top:1px solid rgba(255,255,255,.2);padding-top:4px;color:rgba(255,255,255,.7);}
+.contract-preview .sig-block .sig-canvas-wrap canvas{border-bottom:1px solid rgba(255,255,255,.2);display:block;width:100%;height:50px;}
 
 #signaturePad{border:1px solid var(--b2);border-radius:8px;width:100%;background:#fff;display:block;cursor:crosshair;}
 
@@ -139,15 +142,17 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--dark);color:va
 
 footer{background:var(--dark-2);border-top:1px solid var(--b1);color:var(--text-m);text-align:center;padding:12px;font-size:11px;margin-top:20px;}
 footer strong{color:rgba(255,255,255,.7);}
-</style>
+  </style>
+</head>
+<body>
 
 <script>
-const API="https://script.google.com/macros/s/AKfycbygKRz9AUzRpzibfth4GzKwc5TKD3gcHs_coj4dPesJ1aGSup3M-mgG-k1Kv6NAVxe2/exec";
-// PIN tidak lagi disimpan di frontend — diverifikasi server-side
+const API="https://script.google.com/macros/s/AKfycbzRdh-WEEwKgFOCLFWJIZgANOzOLduJHd4ww-QqlVSjCyjakelJHftSRQCIDDkAjzhZ/exec";
 let genID='',genPass='';
 let files={foto:null,ktp:null,kk:null};
 let sigCanvas,sigCtx,drawing=false;
-</script>
+const OWNER_SIG_B64="https://i.ibb.co.com/0pSmWBNF/da50f6da-b35c-4fb0-9deb-952bacbe69d0.webp";
+<\/script>
 
 <!-- TOP BAR -->
 <div class="top-bar">
@@ -174,7 +179,7 @@ let sigCanvas,sigCtx,drawing=false;
       <div class="menu-card" onclick="showPin()">
         <div class="menu-icon">🔐</div>
         <div class="menu-title">Dashboard Owner</div>
-        <div class="menu-desc">Kelola pengajuan & data</div>
+        <div class="menu-desc">Kelola pengajuan &amp; data</div>
       </div>
       <div class="menu-card" onclick="go('p-lupaid')" style="grid-column:1/-1;">
         <div class="menu-icon">🔎</div>
@@ -202,7 +207,7 @@ let sigCanvas,sigCtx,drawing=false;
 <div id="p-step1" class="page">
   <div class="container">
     <button class="back-btn" onclick="go('p-home')">← Kembali</button>
-    <div class="section-title">Data Diri & Berkas</div>
+    <div class="section-title">Data Diri &amp; Berkas</div>
     <div class="section-sub">Langkah 1 dari 3</div>
     <div class="stepper">
       <div class="step-dot active">1</div><div class="step-line"></div>
@@ -310,11 +315,11 @@ let sigCanvas,sigCtx,drawing=false;
     <div class="card">
       <div class="contract-preview" id="contractText"></div>
       <div class="form-group" style="margin-top:14px;">
-        <label class="form-label">Tanda Tangan <span class="req">*</span></label>
+        <label class="form-label">Tanda Tangan Karyawan <span class="req">*</span></label>
         <canvas id="signaturePad" width="400" height="120"></canvas>
         <button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="clearSig()">Hapus</button>
       </div>
-      <button class="btn btn-success btn-full" id="submitBtn" onclick="finalSubmit()" style="margin-top:6px;">Selesai & Kirim ✅</button>
+      <button class="btn btn-success btn-full" id="submitBtn" onclick="finalSubmit()" style="margin-top:6px;">Selesai &amp; Kirim ✅</button>
     </div>
   </div>
   <footer><strong>Steam MP 7000</strong></footer>
@@ -457,7 +462,6 @@ function upload(input,key,pvId,nmId){
   r.readAsDataURL(f);
 }
 function generateUniqueID(){
-  // Timestamp 3 digit terakhir + 3 digit random = 6 karakter, jauh lebih unik dari 4 digit acak
   const ts=Date.now().toString().slice(-3);
   const rnd=String(Math.floor(100+Math.random()*900));
   return ts+rnd;
@@ -479,67 +483,32 @@ function validateStep1(){
   go('p-step2');
 }
 function showStep3(){
-  const nama   = document.getElementById('s1-nama').value.trim();
-  const alamat = document.getElementById('s1-alamat').value.trim();
-  const noKTP  = document.getElementById('s1-ktp').value.trim();
-  const cabang = document.getElementById('s1-cabang').value;
-  const d      = new Date();
-  const tgl    = d.getDate();
-  const bln    = d.toLocaleDateString('id-ID',{month:'long'});
-  const thn    = d.getFullYear();
-  const isGrobogan = cabang === 'Cabang Grobogan';
-  const targetBonus = isGrobogan ? '100' : '50';
-  const cabangPasal = isGrobogan ? 'Cabang Grobogan' : 'Cabang Palis / Cayur';
-
+  const nama=document.getElementById('s1-nama').value.trim();
+  const alamat=document.getElementById('s1-alamat').value.trim();
+  const noKTP=document.getElementById('s1-ktp').value.trim();
+  const cabang=document.getElementById('s1-cabang').value;
+  const today=new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
   document.getElementById('contractText').innerHTML=`
-<div style="font-family:serif;font-size:11px;color:rgba(255,255,255,.88);line-height:1.85;padding:4px 0;">
-  <p style="text-align:center;font-weight:700;font-size:13px;margin-bottom:2px;">SURAT PERJANJIAN KONTRAK KERJA KARYAWAN</p>
-  <p style="text-align:center;margin-bottom:8px;">Nomor: 030/STMP/SPK/VI/2025<br>Tanggal: ${tgl} bulan ${bln} tahun ${thn}</p>
-
-  <p style="font-weight:700;margin-bottom:3px;">Pihak Pertama (Owner / Pemberi Kerja):</p>
-  <p>Nama: Aldi Septiadi<br>Alamat: Tangerang<br>No. KTP: 3603272009020002</p>
-
-  <p style="font-weight:700;margin:8px 0 3px;">Pihak Kedua (Karyawan):</p>
-  <p>Nama: ${nama}<br>Alamat: ${alamat}<br>No. KTP: ${noKTP}</p>
-
-  <hr style="border-color:rgba(255,255,255,.15);margin:10px 0;">
-
-  <p style="font-weight:700;margin-bottom:4px;">Pasal 1 – Masa Kontrak Kerja</p>
-  <p>Pihak Kedua bekerja kepada Pihak Pertama sebagai karyawan selama 3 (tiga) bulan, mulai tanggal ${tgl} bulan ${bln} tahun ${thn}.</p>
-
-  <p style="font-weight:700;margin:8px 0 4px;">Pasal 2 – Tugas dan Tanggung Jawab</p>
-  <p>• Melaksanakan pekerjaan mencuci motor dengan cepat, bersih, dan rapi sesuai arahan Kepala Toko.<br>
-  • Mematuhi jam kerja yang telah ditentukan, yaitu pukul 07:00 hingga 22:00.<br>
-  • Melaporkan jumlah unit motor yang dicuci setiap hari kepada Kepala Toko.<br>
-  • Menjaga kebersihan area kerja dan memperlakukan peralatan dengan baik.<br>
-  • Tunduk pada wewenang dan arahan Kepala Toko sebagai atasan langsung.</p>
-
-  <p style="font-weight:700;margin:8px 0 4px;">Pasal 3 – Sistem Upah dan Bonus (${cabangPasal})</p>
-  <p>Upah per unit motor Rp 7.000, dibagi:<br>
-  • Karyawan: Rp 3.000<br>
-  • Owner: Rp 4.000<br><br>
-  Kasbon harian maksimal Rp 20.000.<br>
-  Bonus target harian: jika tercapai <strong>${targetBonus} motor</strong> tercuci, mendapat tambahan Rp 5.000.<br>
-  Seluruh tips wajib dicatat dan akan diberikan setelah turun gaji.<br>
-  Pembagian hasil dilakukan per 2 minggu sekali.</p>
-
-  <p style="font-weight:700;margin:8px 0 4px;">Pasal 4 – Pengunduran Diri Sebelum Kontrak Berakhir</p>
-  <p>• Jika mengundurkan diri secara baik-baik, dikenakan potongan sebesar 20% dari total gaji.<br>
-  • Jika mengundurkan diri tanpa pemberitahuan atau melarikan diri, dikenakan potongan maksimal 50% dari total gaji.<br>
-  • Apabila tetap meminta pembayaran gaji setelah melarikan diri, pembayaran hanya dapat dilakukan langsung di tempat kerja.<br>
-  • Seluruh pembayaran gaji wajib diberikan maksimal 7 hari setelah masa kontrak berakhir.</p>
-
-  <p style="font-weight:700;margin:8px 0 4px;">Pasal 5 – Penyelesaian Perselisihan</p>
-  <p>Perselisihan diselesaikan terlebih dahulu secara musyawarah. Jika tidak tercapai kesepakatan, akan diselesaikan sesuai hukum yang berlaku di wilayah Tangerang.</p>
-
-  <hr style="border-color:rgba(255,255,255,.15);margin:10px 0;">
-
-  <p style="text-align:center;margin-bottom:10px;">Tangerang, ${tgl} ${bln} ${thn}</p>
-  <div style="display:flex;justify-content:space-between;text-align:center;font-size:11px;">
-    <div>Pihak Pertama (Owner)<br><br><br>( Aldi Septiadi )</div>
-    <div>Pihak Kedua (Karyawan)<br><br><br>( ${nama} )</div>
-  </div>
-</div>`;
+    <h4>KONTRAK KERJA KARYAWAN</h4>
+    <p><strong>Tanggal:</strong> ${today}</p>
+    <p><strong>Nama:</strong> ${nama}</p>
+    <p><strong>Alamat:</strong> ${alamat}</p>
+    <p><strong>No. KTP:</strong> ${noKTP}</p>
+    <p><strong>Cabang:</strong> ${cabang}</p>
+    <p><strong>ID Karyawan:</strong> ${genID}</p>
+    <p style="margin-top:10px;">Dengan ini saya menyatakan bersedia bekerja sesuai ketentuan dan peraturan yang berlaku di Steam MP 7000.</p>
+    <div class="sig-row">
+      <div class="sig-block">
+        <div class="sig-label">Tanda Tangan Karyawan</div>
+        <div style="height:50px;border-bottom:1px solid rgba(255,255,255,.2);margin-bottom:4px;"></div>
+        <div class="sig-name">${nama}</div>
+      </div>
+      <div class="sig-block">
+        <div class="sig-label">Mengetahui, Pemilik</div>
+        <img src="${OWNER_SIG_B64}" class="sig-img" alt="Tanda Tangan Owner">
+        <div class="sig-name">Aldi Septiadi</div>
+      </div>
+    </div>`;
   go('p-step3');
   initSig();
 }
@@ -558,55 +527,27 @@ function initSig(){
 }
 function clearSig(){if(sigCtx)sigCtx.clearRect(0,0,sigCanvas.width,sigCanvas.height);}
 
-async function postJSON(payload){
-  await fetch(API,{method:'POST',body:JSON.stringify(payload),mode:'no-cors'});
-}
-
 async function finalSubmit(){
   const blank=document.createElement('canvas');blank.width=sigCanvas.width;blank.height=sigCanvas.height;
   if(sigCanvas.toDataURL()===blank.toDataURL()){showToast('Tanda tangan wajib diisi');return;}
   const btn=document.getElementById('submitBtn');
-  btn.disabled=true;
-
-  const nama   = document.getElementById('s1-nama').value.trim();
-  const alamat = document.getElementById('s1-alamat').value.trim();
-  const noKTP  = document.getElementById('s1-ktp').value.trim();
-  const noWA   = document.getElementById('s1-wa').value.trim();
-  const cabang = document.getElementById('s1-cabang').value;
-  const ttd    = sigCanvas.toDataURL('image/png');
-
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Mengirim...';
+  const payload={
+    action:'daftarBaru',
+    idKaryawan:genID,
+    password:genPass,
+    namaLengkap:document.getElementById('s1-nama').value.trim(),
+    alamatKTP:document.getElementById('s1-alamat').value.trim(),
+    noKTP:document.getElementById('s1-ktp').value.trim(),
+    noWA:document.getElementById('s1-wa').value.trim(),
+    cabang:document.getElementById('s1-cabang').value,
+    fotoDiri:files.foto,
+    fotoKTP:files.ktp,
+    fotoKK:files.kk,
+    tanda_tangan:sigCanvas.toDataURL('image/png')
+  };
   try{
-    // 1. Kirim data teks + ID + password dulu
-    btn.innerHTML='<span class="spinner"></span> Mengirim data...';
-    await postJSON({
-      action:'daftarBaru',
-      idKaryawan:genID, password:genPass,
-      namaLengkap:nama, alamatKTP:alamat, noKTP, noWA, cabang,
-      fotoDiri:null, fotoKTP:null, fotoKK:null, tanda_tangan:null
-    });
-
-    // 2. Kirim foto diri
-    if(files.foto){
-      btn.innerHTML='<span class="spinner"></span> Mengirim foto diri...';
-      await postJSON({action:'kirimFoto', idKaryawan:genID, namaLengkap:nama, jenis:'fotoDiri',   data:files.foto});
-    }
-
-    // 3. Kirim foto KTP
-    if(files.ktp){
-      btn.innerHTML='<span class="spinner"></span> Mengirim foto KTP...';
-      await postJSON({action:'kirimFoto', idKaryawan:genID, namaLengkap:nama, jenis:'fotoKTP',    data:files.ktp});
-    }
-
-    // 4. Kirim foto KK
-    if(files.kk){
-      btn.innerHTML='<span class="spinner"></span> Mengirim foto KK...';
-      await postJSON({action:'kirimFoto', idKaryawan:genID, namaLengkap:nama, jenis:'fotoKK',     data:files.kk});
-    }
-
-    // 5. Kirim tanda tangan
-    btn.innerHTML='<span class="spinner"></span> Mengirim tanda tangan...';
-    await postJSON({action:'kirimFoto', idKaryawan:genID, namaLengkap:nama, jenis:'tandaTangan', data:ttd});
-
+    await fetch(API,{method:'POST',body:JSON.stringify(payload),mode:'no-cors'});
     go('p-success');
   }catch(e){
     showToast('Gagal mengirim, coba lagi');
@@ -655,7 +596,7 @@ function renderPengajuan(list){
       <td>${r.cabang||'-'}</td>
       <td><span class="badge badge-pending">${r.status||'Pending'}</span></td>
       <td style="display:flex;gap:5px;flex-wrap:wrap;">
-        <button class="btn btn-success btn-sm" onclick="approveRow(${r.rowIndex},'${(r.namaLengkap||'').replace(/'/g,"\\'")}','${r.noWA||''}','${r.cabang||''}')">✓ Setujui</button>
+        <button class="btn btn-success btn-sm" onclick="approveRow(${r.rowIndex},'${(r.namaLengkap||'').replace(/'/g,&quot;\\&apos;&quot;)}','${r.noWA||''}','${r.cabang||''}')">✓ Setujui</button>
         <button class="btn btn-danger btn-sm" onclick="rejectRow(${r.rowIndex})">✕ Tolak</button>
       </td>
     </tr>`;
@@ -696,7 +637,7 @@ function showToast(msg){
   const t=document.createElement('div');t.className='toast';t.textContent=msg;
   document.body.appendChild(t);setTimeout(()=>t.remove(),3000);
 }
-</script>
+<\/script>
 
 </body>
 </html>
